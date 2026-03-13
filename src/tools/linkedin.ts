@@ -7,7 +7,7 @@ import { SYSTEM_PROMPTS } from "../ai/prompts.js";
 export const linkedinTools = {
   search_linkedin: {
     description:
-      "Search LinkedIn for people matching an ICP. Returns guidance on using LinkedIn MCP integration for actual search.",
+      "Search LinkedIn for people matching an ICP. Checks for LinkedIn MCP availability and offers fallback options.",
     schema: z.object({
       icpId: z.number().describe("ICP ID to search for"),
       keywords: z.string().optional().describe("Additional search keywords"),
@@ -17,49 +17,67 @@ export const linkedinTools = {
       const icp = db.select().from(icps).where(eq(icps.id, args.icpId)).get();
       if (!icp) return { content: [{ type: "text" as const, text: "ICP not found" }] };
 
-      // This tool provides search parameters — the actual LinkedIn search
-      // would be done via the LinkedIn MCP server integration
-      const searchParams = {
-        icpName: icp.name,
-        suggestedKeywords: [
-          icp.demographics,
-          icp.behaviors,
-          args.keywords,
-        ].filter(Boolean).join(", "),
-        suggestedFilters: {
+      const searchKeywords = [icp.demographics, icp.behaviors, args.keywords]
+        .filter(Boolean)
+        .join(" ");
+
+      const linkedinSearchUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(searchKeywords)}`;
+
+      const response = {
+        icp: {
+          name: icp.name,
           demographics: icp.demographics,
           behaviors: icp.behaviors,
+          painPoints: icp.painPoints,
         },
-        instruction:
-          "Use the LinkedIn MCP server's search_people tool with these parameters to find matching profiles. Then use add_contact to save interesting leads.",
+        searchKeywords,
+        linkedinSearchUrl,
+        _instruction: `IMPORTANT: Follow these steps in order:
+
+1. Check if you have access to a tool called "search_people" (from the LinkedIn MCP server).
+
+2. IF "search_people" IS available:
+   Use it directly with keywords: "${searchKeywords}"
+   Then use add_contact to save any interesting profiles to this project.
+
+3. IF "search_people" IS NOT available, ask the user which option they'd prefer:
+   a) Install the LinkedIn MCP server for direct search integration: https://github.com/stickerdaniel/linkedin-mcp-server
+   b) Search LinkedIn manually using this link: ${linkedinSearchUrl}
+   c) Do a web search now to find people matching this ICP
+
+Then act on whatever the user chooses.`,
       };
 
-      return { content: [{ type: "text" as const, text: JSON.stringify(searchParams, null, 2) }] };
+      return { content: [{ type: "text" as const, text: JSON.stringify(response, null, 2) }] };
     },
   },
 
   get_linkedin_profile: {
-    description: "Get details on a specific LinkedIn profile to inform outreach",
+    description:
+      "Get details on a specific LinkedIn profile. Checks for LinkedIn MCP availability and offers fallback options.",
     schema: z.object({
       linkedinUrl: z.string().describe("LinkedIn profile URL"),
     }),
     handler: async ({ linkedinUrl }: { linkedinUrl: string }) => {
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: JSON.stringify(
-              {
-                linkedinUrl,
-                instruction:
-                  "Use the LinkedIn MCP server's get_person_profile tool with this URL to get profile details. The profile information can then be used to personalize outreach via generate_outreach.",
-              },
-              null,
-              2
-            ),
-          },
-        ],
+      const response = {
+        linkedinUrl,
+        _instruction: `IMPORTANT: Follow these steps in order:
+
+1. Check if you have access to a tool called "get_person_profile" (from the LinkedIn MCP server).
+
+2. IF "get_person_profile" IS available:
+   Use it with this URL to get full profile details.
+   The profile info can then be used to personalize outreach via generate_outreach.
+
+3. IF "get_person_profile" IS NOT available, ask the user which option they'd prefer:
+   a) Install the LinkedIn MCP server for direct profile access: https://github.com/stickerdaniel/linkedin-mcp-server
+   b) Open the profile directly: ${linkedinUrl}
+   c) Do a web search for this person to find public info about them
+
+Then act on whatever the user chooses.`,
       };
+
+      return { content: [{ type: "text" as const, text: JSON.stringify(response, null, 2) }] };
     },
   },
 
