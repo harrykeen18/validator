@@ -16,14 +16,27 @@ export const mcpPrompts = {
           type: "text" as const,
           text: `I want to validate a startup idea: ${args.idea}
 
-Please help me:
-1. Crystallize the core assumption — what must be true for this to work?
-2. Break it down into 3-5 testable hypotheses (customer, problem, solution, willingness-to-pay)
-3. Define acceptance criteria for each hypothesis
-4. Identify the riskiest hypothesis to test first
-5. Suggest an ideal customer profile (ICP) to start interviewing
+IMPORTANT: This is a GUIDED, INTERACTIVE process. Do NOT rush through it. Follow these steps ONE AT A TIME, waiting for my input at each stage:
 
-Use the create_project tool to set up the project, then create_hypothesis for each hypothesis, and create_icp for the customer profile.`,
+**Step 1 — Create the project**
+Use create_project to set up the project. It will return a welcome message with an overview of the full process and some questions for me. STOP here and present the welcome message and questions to me. Wait for my answers.
+
+**Step 2 — Discuss and crystallize (ONLY after I've answered the Step 1 questions)**
+Based on my answers, help me crystallize:
+- What's the core assumption that must be true for this to work?
+- What are the riskiest unknowns?
+Talk this through with me. Share your honest take on the idea. Ask follow-up questions if my answers are vague. Do NOT create hypotheses yet.
+
+**Step 3 — Build hypotheses together (ONLY after we've had the Step 2 discussion)**
+Now suggest 3-5 testable hypotheses based on our discussion. Present them to me FIRST for feedback before creating them. I might want to reword them or add/remove some. Once I'm happy, use create_hypothesis for each one, then prioritize_hypotheses to rank them.
+
+**Step 4 — Define the ICP (ONLY after hypotheses are set)**
+Based on the hypotheses, suggest an ideal customer profile. Discuss it with me, then use create_icp.
+
+**Step 5 — Plan first outreach**
+Suggest next steps for finding people to talk to.
+
+Remember: this is a conversation, not a batch job. Be a coach — explain your thinking, challenge my assumptions, and make sure I'm bought into each step before moving on.`,
         },
       },
     ],

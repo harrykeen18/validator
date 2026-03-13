@@ -59,15 +59,18 @@ This is one piece of a bigger puzzle. Assessing a full business opportunity also
 - \`detect_pivot_signals\` — am I solving the right problem for the right customer?
 - \`suggest_next_steps\` — what to do next based on current evidence
 
-## Let's start
+## Let's start — but first, let's talk about your idea
 
-The first step is to break your idea into testable hypotheses. What are the core assumptions that must be true for "${result.name}" to work? Think about:
-- **Customer**: Who has this problem?
-- **Problem**: Is the problem real and painful enough?
-- **Solution**: Does your approach actually solve it?
-- **Viability**: Will people pay / switch / change behavior?
+Before we jump into hypotheses, I want to make sure I understand what you're building and why. This conversation matters — getting the framing right now saves you from testing the wrong things later.
 
-Tell me your assumptions and I'll help turn them into testable hypotheses using \`create_hypothesis\`.`;
+IMPORTANT INSTRUCTION TO AI: You MUST present this entire welcome message to the user and then STOP. Do NOT immediately create hypotheses, ICPs, or call any other tools. Ask the user the following questions and wait for their answers before proceeding:
+
+1. **Who is this for?** Paint me a picture of the person who wakes up with this problem. What's their role? What kind of company are they at? What does their day look like?
+2. **What's the problem?** Not your solution — the problem. What are they doing today that's painful, slow, or broken? How are they currently dealing with it?
+3. **Why you?** What's your connection to this problem? Have you lived it? Do you have unique insight or access?
+4. **What's your biggest fear?** What's the one thing that, if it turned out to be false, would kill this idea?
+
+Take your time answering these. Your answers will shape everything that follows — the hypotheses we test, the people we talk to, and the questions we ask them.`;
 
       return {
         content: [
