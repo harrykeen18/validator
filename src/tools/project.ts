@@ -18,7 +18,14 @@ export const projectTools = {
 
 Project "${result.name}" created (ID: ${result.id}).
 
-I'll help you validate this idea by talking to real customers, not by building. Here's how the process works:
+## What this tool does (and doesn't do)
+
+Validator helps you answer three specific questions through real customer conversations:
+1. **Does the problem actually exist?** Not in theory — do real people experience it, and how painful is it?
+2. **Who has it worst?** Which customer segment feels the most pain, and what does their profile look like?
+3. **Will they pay to solve it?** How much, and what would make them switch from their current workaround?
+
+This is one piece of a bigger puzzle. Assessing a full business opportunity also means evaluating your **founder-market fit** (why are you the right person to solve this?), **market size** (is this big enough to matter?), and **competitive advantage** (what makes you defensible?). Validator gives you the customer evidence datapoint — use it alongside your broader opportunity assessment.
 
 ## The Workflow
 
