@@ -46,7 +46,7 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
               {
                 ...result,
                 _nextStep:
-                  "Here's your draft. Edit it if you like, then send it yourself. Let me know once you've sent it and I'll log it with update_outreach_status so we can track response rates. If you want a different angle, use suggest_outreach_variant.",
+                  "Here's your draft — but you'll want to manually edit it to add a genuine personal touch. AI-generated messages are a starting point, not the final version. Once you're happy, send it yourself and let me know so I'll log it with update_outreach_status. Tip: cold outreach response rates will be low, but that's fine — the response rate itself is signal. Bolster with 1st and 2nd degree connections too. If you want a different angle, use suggest_outreach_variant.",
               },
               null,
               2

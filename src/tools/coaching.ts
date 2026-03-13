@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { getDb, hypotheses, contacts, conversations, insights } from "../db/index.js";
 import { generateText } from "../ai/client.js";
 import { SYSTEM_PROMPTS } from "../ai/prompts.js";
-import { MOM_TEST_PRINCIPLES } from "../resources/methodology.js";
+import { MOM_TEST_PRINCIPLES, HARRY_TIPS } from "../resources/methodology.js";
 
 export const coachingTools = {
   generate_call_guide: {
@@ -60,10 +60,15 @@ ${hyps.map((h, i) => `${i + 1}. ${h.statement} (Acceptance criteria: ${h.accepta
 
   get_call_principles: {
     description:
-      "Return Mom Test principles and anti-patterns as reminders before a call. No parameters required. Good to review before any customer discovery conversation.",
+      "Return Mom Test principles, practical tips, and anti-patterns as reminders before a call. No parameters required. Good to review before any customer discovery conversation.",
     schema: z.object({}),
     handler: async () => {
-      return { content: [{ type: "text" as const, text: MOM_TEST_PRINCIPLES }] };
+      return {
+        content: [
+          { type: "text" as const, text: MOM_TEST_PRINCIPLES },
+          { type: "text" as const, text: HARRY_TIPS },
+        ],
+      };
     },
   },
 

@@ -14,7 +14,7 @@ import {
   getProjectInsights,
   getProjectContacts,
 } from "./resources/project.js";
-import { MOM_TEST_PRINCIPLES, ANTI_PATTERNS } from "./resources/methodology.js";
+import { MOM_TEST_PRINCIPLES, ANTI_PATTERNS, HARRY_TIPS } from "./resources/methodology.js";
 
 const server = new McpServer({
   name: "validator",
@@ -97,6 +97,15 @@ server.resource(
   { description: "Common founder mistakes in discovery" },
   async (uri) => ({
     contents: [{ uri: uri.href, text: ANTI_PATTERNS, mimeType: "text/markdown" }],
+  })
+);
+
+server.resource(
+  "harry-tips",
+  "validator://methodology/harry-tips",
+  { description: "Practical tips on outreach, call techniques, and staying objective" },
+  async (uri) => ({
+    contents: [{ uri: uri.href, text: HARRY_TIPS, mimeType: "text/markdown" }],
   })
 );
 

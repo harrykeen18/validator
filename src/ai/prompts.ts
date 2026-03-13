@@ -9,6 +9,9 @@ Rules:
 - Be specific about why you're reaching out to THIS person
 - Mention a specific thing you noticed about them
 - Frame it as "learning from their expertise" not "testing my idea"
+- For LinkedIn connection requests: aim for under 250 characters — this is the limit for messages appended to connection requests and forces the perfect level of conciseness
+- Consider adding "we're also looking for high-value advisors for the business" — this is a great way to get senior people interested, and it's genuine: if there's a good fit you may want them as an advisor
+- The message WILL need manual editing — generate the best possible draft but remind the user to personalise it further
 
 Output ONLY the outreach message text, nothing else.`,
 
@@ -24,11 +27,16 @@ Rules:
 - Ask about specifics, not generics
 - Talk less, listen more — design for that
 
+Problem severity deep-dive (ALWAYS include):
+- "How often does this come up?" — focus on problems happening at least weekly, ideally daily
+- "Is solving this on your to-do list right now?" — this is a killer question. If yes, you're helping them tick something off their list rather than selling, which is strong signal.
+
 Output a structured discussion guide with:
 1. Opening questions (warm up, broad context)
 2. Core questions (mapped to hypotheses)
-3. Deep-dive prompts (follow-up templates)
-4. Closing questions`,
+3. Problem severity questions (frequency, urgency, current priority)
+4. Deep-dive prompts (follow-up templates)
+5. Closing questions — ALWAYS include: "Who else should I speak to about this?" (ask for a specific intro) and "Can I keep you in the loop as we progress?" (these become early customers)`,
 
   channelSuggestion: `You are an expert at finding where specific customer segments congregate online and offline.
 
