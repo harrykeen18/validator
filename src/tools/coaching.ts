@@ -102,28 +102,35 @@ ${hyps.map((h, i) => `${i + 1}. ${h.statement} (Acceptance criteria: ${h.accepta
         .get();
 
       const debriefQuestions = `# Post-Call Debrief — ${contact?.name || "Unknown"}
-## Conversation ID: ${conv.id}
 
-For each hypothesis you were testing, capture what you learned:
+Nice work getting through a call. Let's capture what you learned while it's fresh. I'm going to walk you through each hypothesis — be honest with yourself about what you actually heard vs. what you wanted to hear.
+
+**Conversation ID: ${conv.id}** (I'll need this to link your insights)
+
+---
 
 ${hyps
   .map(
     (h, i) => `### Hypothesis ${i + 1}: ${h.statement}
-- What specific things did they say that relate to this?
-- Any verbatim quotes worth capturing?
-- Does this evidence support, contradict, or say nothing about the hypothesis?
-- How strong is the signal? (strong = past behavior/money spent, medium = specific preference, weak = opinion/future promise)`
+Let's be rigorous here:
+- What did they **actually say** about this? Try to remember their exact words.
+- Did they describe **past behavior** (strong signal) or just share an **opinion** (weaker)?
+- Does what they said **support**, **contradict**, or say **nothing** about this hypothesis?
+- Be honest about signal strength: "I spent 3 hours last week doing X manually" = strong. "Yeah that sounds like it could be useful" = weak.`
   )
   .join("\n\n")}
 
-### General
-- What surprised you most?
-- What did you learn that you didn't expect?
-- Did they mention any problems/workflows you hadn't considered?
-- Were there any moments where you caught yourself pitching instead of listening?
+### The bigger picture
+- What surprised you most? What did you learn that you genuinely didn't expect?
+- Did they mention any problems or workflows you hadn't even considered? (These surprises are often more valuable than confirming what you already thought.)
+- Were there any moments where you caught yourself pitching instead of listening? Be honest — it happens to everyone.
+- **Did you ask who else to talk to?** If you got a name, that's gold — warm intros convert way better than cold outreach.
+- **Did you ask to keep them in the loop?** These early conversations often become your first customers.
 
 ---
-_Next step: Use record_insight for each insight (pass conversationId: ${conv.id}, projectId: ${args.projectId}). When you're done, use update_contact_status to mark contact ${args.contactId} as "completed". If you have a transcript, use analyze_transcript instead for automatic extraction._`;
+Let's go through each insight one by one. Tell me what you learned and I'll help you rate the signal strength — I'll push back if I think you're being too generous. I'll use record_insight to save each one (with conversationId: ${conv.id}, projectId: ${args.projectId}).
+
+If you have a recording or transcript, you can also use analyze_transcript and I'll extract insights automatically.`;
 
       return { content: [{ type: "text" as const, text: debriefQuestions }] };
     },
