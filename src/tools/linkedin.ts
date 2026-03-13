@@ -7,7 +7,7 @@ import { SYSTEM_PROMPTS } from "../ai/prompts.js";
 export const linkedinTools = {
   search_linkedin: {
     description:
-      "Search LinkedIn for people matching an ICP. Checks for LinkedIn MCP availability and offers fallback options.",
+      "Search LinkedIn for people matching an ICP. Generates targeted search queries, checks for LinkedIn MCP availability, and offers fallback options.",
     schema: z.object({
       icpId: z.number().describe("ICP ID to search for"),
       keywords: z.string().optional().describe("Additional search keywords"),
@@ -17,11 +17,45 @@ export const linkedinTools = {
       const icp = db.select().from(icps).where(eq(icps.id, args.icpId)).get();
       if (!icp) return { content: [{ type: "text" as const, text: "ICP not found" }] };
 
-      const searchKeywords = [icp.demographics, icp.behaviors, args.keywords]
-        .filter(Boolean)
-        .join(" ");
+      // Use AI to generate proper search queries from the ICP
+      const searchQueries = await generateText(
+        "claude-sonnet-4-6",
+        `You generate search queries to find INDIVIDUAL PEOPLE who match a customer profile.
+You are NOT looking for companies, products, articles, or competitors.
 
-      const linkedinSearchUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(searchKeywords)}`;
+Rules:
+- Generate queries that find the PEOPLE, not the problem space or tools
+- Use job titles, roles, and seniority levels as primary search terms
+- For LinkedIn: use short keyword combos like "VP Engineering Series A" or "Head of Product fintech"
+- For web search: use "site:linkedin.com/in" to find actual profiles
+- Generate 3 LinkedIn keyword queries and 2 web search queries
+- Each query should target a slightly different angle on the same ICP
+
+Output JSON only:
+{ "linkedinQueries": ["query1", "query2", "query3"], "webSearchQueries": ["query1", "query2"] }`,
+        `Find people matching this Ideal Customer Profile:
+
+Name: ${icp.name}
+Demographics: ${icp.demographics}
+Behaviors: ${icp.behaviors}
+Pain Points: ${icp.painPoints}
+Channels: ${icp.channels}
+${args.keywords ? `Additional context: ${args.keywords}` : ""}`
+      );
+
+      let queries: { linkedinQueries: string[]; webSearchQueries: string[] };
+      try {
+        queries = JSON.parse(searchQueries);
+      } catch {
+        queries = {
+          linkedinQueries: [icp.name],
+          webSearchQueries: [`site:linkedin.com/in ${icp.demographics}`],
+        };
+      }
+
+      const linkedinSearchUrls = queries.linkedinQueries.map(
+        (q) => `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}`
+      );
 
       const response = {
         icp: {
@@ -30,20 +64,25 @@ export const linkedinTools = {
           behaviors: icp.behaviors,
           painPoints: icp.painPoints,
         },
-        searchKeywords,
-        linkedinSearchUrl,
+        searchQueries: queries,
+        linkedinSearchUrls,
         _instruction: `IMPORTANT: Follow these steps in order:
 
 1. Check if you have access to a tool called "search_people" (from the LinkedIn MCP server).
 
 2. IF "search_people" IS available:
-   Use it directly with keywords: "${searchKeywords}"
-   Then use add_contact to save any interesting profiles to this project.
+   Run multiple searches using these LinkedIn queries to find different angles on the ICP:
+   ${queries.linkedinQueries.map((q, i) => `   ${i + 1}. "${q}"`).join("\n")}
+   Review the results and use add_contact to save people who genuinely match the ICP.
+   IMPORTANT: Skip anyone who looks like a competitor or vendor — you want potential CUSTOMERS, not people selling similar products.
 
 3. IF "search_people" IS NOT available, ask the user which option they'd prefer:
-   a) Install the LinkedIn MCP server for direct search integration: https://github.com/stickerdaniel/linkedin-mcp-server
-   b) Search LinkedIn manually using this link: ${linkedinSearchUrl}
-   c) Do a web search now to find people matching this ICP
+   a) Install the LinkedIn MCP server for direct search: https://github.com/stickerdaniel/linkedin-mcp-server
+   b) Search LinkedIn manually using these links:
+      ${linkedinSearchUrls.map((url, i) => `${i + 1}. ${url}`).join("\n      ")}
+   c) Do a web search now to find people matching this ICP — use these queries:
+      ${queries.webSearchQueries.map((q, i) => `${i + 1}. "${q}"`).join("\n      ")}
+      IMPORTANT: Look for actual people's LinkedIn profiles or personal sites, NOT companies, tools, or articles about the space.
 
 Then act on whatever the user chooses.`,
       };
