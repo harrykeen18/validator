@@ -6,15 +6,27 @@ import { SYSTEM_PROMPTS } from "../ai/prompts.js";
 
 export const synthesisTools = {
   synthesize_insights: {
-    description: "Analyze all insights across calls — patterns, contradictions, surprises",
+    description:
+      "Analyze all insights across calls — finds patterns, contradictions, and surprises. Requires: projectId (number). Works best after 3+ conversations with recorded insights. Use record_insight or analyze_transcript first to build up evidence.",
     schema: z.object({
-      projectId: z.number().describe("Project ID"),
+      projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
       const db = getDb();
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
       const convs = db.select().from(conversations).where(eq(conversations.projectId, projectId)).all();
+
+      if (allInsights.length === 0) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: "No insights recorded yet. Do some customer discovery calls first, then use record_insight or analyze_transcript to capture what you learn.",
+            },
+          ],
+        };
+      }
 
       const userMessage = `Synthesize these customer discovery insights.
 
@@ -32,19 +44,38 @@ ${allInsights
   .join("\n")}`;
 
       const synthesis = await generateText("claude-opus-4-6", SYSTEM_PROMPTS.synthesis, userMessage, 4096);
-      return { content: [{ type: "text" as const, text: synthesis }] };
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: synthesis + "\n\n---\n_Next: use suggest_next_steps for specific actions, or detect_pivot_signals if the evidence is pointing in an unexpected direction._",
+          },
+        ],
+      };
     },
   },
 
   get_validation_scorecard: {
-    description: "Current state of all hypotheses with supporting/contradicting evidence",
+    description:
+      "Current state of all hypotheses with supporting and contradicting evidence. Requires: projectId (number). Shows each hypothesis with its evidence for and against — good for seeing where you stand at a glance.",
     schema: z.object({
-      projectId: z.number().describe("Project ID"),
+      projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
       const db = getDb();
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
+
+      if (hyps.length === 0) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: "No hypotheses found. Use create_hypothesis to add hypotheses to your project first.",
+            },
+          ],
+        };
+      }
 
       const scorecard = hyps.map((h) => {
         const related = allInsights.filter((i) => i.hypothesisId === h.id);
@@ -74,14 +105,30 @@ ${allInsights
         };
       });
 
-      return { content: [{ type: "text" as const, text: JSON.stringify(scorecard, null, 2) }] };
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                scorecard,
+                _nextStep:
+                  "Review your evidence. Hypotheses with strong contradicting signals may need to be invalidated via update_hypothesis. If you're unsure what to do next, use suggest_next_steps or detect_pivot_signals.",
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
     },
   },
 
   suggest_next_steps: {
-    description: "Recommend what to do next based on current evidence",
+    description:
+      "AI-powered recommendations for what to do next based on current evidence. Requires: projectId (number). Works best after a few conversations and recorded insights.",
     schema: z.object({
-      projectId: z.number().describe("Project ID"),
+      projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
       const db = getDb();
@@ -107,14 +154,26 @@ ${allInsights.map((i) => `- [${i.signalStrength}/${i.direction}] ${i.content}`).
   },
 
   detect_pivot_signals: {
-    description: "Flag when evidence points to a different problem/customer than expected",
+    description:
+      "Analyze whether evidence points to a different problem or customer than expected. Requires: projectId (number). Best used after 5+ conversations when you have enough evidence to spot patterns. Uses deep analysis to weigh contradictory evidence.",
     schema: z.object({
-      projectId: z.number().describe("Project ID"),
+      projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
       const db = getDb();
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
+
+      if (allInsights.length < 3) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `Only ${allInsights.length} insight(s) recorded — not enough evidence to detect pivot signals reliably. Do more discovery calls and record insights first.`,
+            },
+          ],
+        };
+      }
 
       const userMessage = `Analyze this customer discovery evidence for pivot signals.
 
@@ -135,9 +194,10 @@ ${allInsights
   },
 
   get_progress_report: {
-    description: "Calls done, hypotheses tested, key learnings — good for check-ins",
+    description:
+      "Summary of validation progress: calls done, hypotheses tested, insights collected. Requires: projectId (number). Good for weekly check-ins and tracking momentum.",
     schema: z.object({
-      projectId: z.number().describe("Project ID"),
+      projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
       const db = getDb();
@@ -182,6 +242,12 @@ ${allInsights
             neutral: allInsights.filter((i) => i.direction === "neutral").length,
           },
         },
+        _nextStep:
+          convs.length === 0
+            ? "No conversations yet. Start by finding contacts with search_linkedin or add_contact, then generate_outreach to reach out."
+            : hyps.filter((h) => h.status === "untested").length > 0
+              ? "You still have untested hypotheses. Use prioritize_hypotheses to figure out which to tackle next."
+              : "Good progress. Use synthesize_insights for a cross-conversation analysis, or get_validation_scorecard to see your evidence summary.",
       };
 
       return { content: [{ type: "text" as const, text: JSON.stringify(report, null, 2) }] };
@@ -189,14 +255,26 @@ ${allInsights
   },
 
   prioritize_hypotheses: {
-    description: "Rank hypotheses by importance and testability using AI analysis",
+    description:
+      "AI-ranked hypotheses by risk, testability, and dependencies. Requires: projectId (number). The project should have hypotheses created via create_hypothesis.",
     schema: z.object({
-      projectId: z.number().describe("Project ID"),
+      projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
       const db = getDb();
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
+
+      if (hyps.length === 0) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: "No hypotheses found. Use create_hypothesis to add hypotheses to your project first.",
+            },
+          ],
+        };
+      }
 
       const userMessage = `Prioritize these hypotheses for testing.
 
@@ -211,7 +289,14 @@ ${hyps
   .join("\n")}`;
 
       const ranking = await generateText("claude-sonnet-4-6", SYSTEM_PROMPTS.prioritizeHypotheses, userMessage);
-      return { content: [{ type: "text" as const, text: ranking }] };
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: ranking + "\n\n---\n_Next: focus your upcoming calls on the top-priority hypothesis. Use generate_call_guide to build a discussion guide targeting it._",
+          },
+        ],
+      };
     },
   },
 };

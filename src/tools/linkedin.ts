@@ -7,9 +7,9 @@ import { SYSTEM_PROMPTS } from "../ai/prompts.js";
 export const linkedinTools = {
   search_linkedin: {
     description:
-      "Search LinkedIn for people matching an ICP. Generates targeted search queries, checks for LinkedIn MCP availability, and offers fallback options.",
+      "Search LinkedIn for people matching an ICP. Requires: icpId (number). Use create_icp first to define your ideal customer profile. Generates targeted search queries and checks for LinkedIn MCP availability.",
     schema: z.object({
-      icpId: z.number().describe("ICP ID to search for"),
+      icpId: z.number().describe("ICP ID — get this from create_icp"),
       keywords: z.string().optional().describe("Additional search keywords"),
     }),
     handler: async (args: { icpId: number; keywords?: string }) => {
@@ -93,9 +93,9 @@ Then act on whatever the user chooses.`,
 
   get_linkedin_profile: {
     description:
-      "Get details on a specific LinkedIn profile. Checks for LinkedIn MCP availability and offers fallback options.",
+      "Get details on a specific LinkedIn profile to inform outreach. Requires: linkedinUrl (string). Use this before generate_outreach to get context for personalizing the message.",
     schema: z.object({
-      linkedinUrl: z.string().describe("LinkedIn profile URL"),
+      linkedinUrl: z.string().describe("Full LinkedIn profile URL (e.g., https://www.linkedin.com/in/someone)"),
     }),
     handler: async ({ linkedinUrl }: { linkedinUrl: string }) => {
       const response = {
@@ -121,9 +121,10 @@ Then act on whatever the user chooses.`,
   },
 
   suggest_channels: {
-    description: "Given an ICP, suggest communities, platforms, events where these people congregate",
+    description:
+      "Suggest specific communities, platforms, events, and channels where your ICP congregates. Requires: icpId (number). Use create_icp first to define your ideal customer profile.",
     schema: z.object({
-      icpId: z.number().describe("ICP ID"),
+      icpId: z.number().describe("ICP ID — get this from create_icp"),
     }),
     handler: async ({ icpId }: { icpId: number }) => {
       const db = getDb();

@@ -4,7 +4,8 @@ import { getDb, projects, hypotheses, contacts, insights, conversations } from "
 
 export const projectTools = {
   create_project: {
-    description: "Initialize a new validation project with idea description",
+    description:
+      "Initialize a new validation project. Requires: name, description. This is the first tool to call — most other tools need a projectId from this.",
     schema: z.object({
       name: z.string().describe("Project name"),
       description: z.string().describe("Describe the idea you want to validate"),
@@ -12,12 +13,27 @@ export const projectTools = {
     handler: async ({ name, description }: { name: string; description: string }) => {
       const db = getDb();
       const result = db.insert(projects).values({ name, description }).returning().get();
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                ...result,
+                _nextStep:
+                  "Project created. Next: use create_hypothesis to add 3-5 testable hypotheses, then create_icp to define your ideal customer profile.",
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
     },
   },
 
   list_projects: {
-    description: "List all active validation projects",
+    description: "List all active validation projects. No parameters required. Use this to find a projectId before calling other tools.",
     schema: z.object({}),
     handler: async () => {
       const db = getDb();
@@ -27,14 +43,15 @@ export const projectTools = {
   },
 
   get_project_status: {
-    description: "Full project overview: hypotheses, progress, key metrics",
+    description:
+      "Full project overview: hypotheses, progress, key metrics. Requires: projectId (number). Use list_projects first if you don't have the projectId.",
     schema: z.object({
-      projectId: z.number().describe("Project ID"),
+      projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
       const db = getDb();
       const project = db.select().from(projects).where(eq(projects.id, projectId)).get();
-      if (!project) return { content: [{ type: "text" as const, text: "Project not found" }] };
+      if (!project) return { content: [{ type: "text" as const, text: "Project not found. Use list_projects to see available projects." }] };
 
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const conts = db.select().from(contacts).where(eq(contacts.projectId, projectId)).all();
@@ -62,9 +79,10 @@ export const projectTools = {
   },
 
   create_hypothesis: {
-    description: "Add a testable hypothesis with acceptance criteria",
+    description:
+      "Add a testable hypothesis with acceptance criteria. Requires: projectId (number), statement (string), acceptanceCriteria (string). Call create_project first if you don't have a projectId.",
     schema: z.object({
-      projectId: z.number().describe("Project ID"),
+      projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
       statement: z.string().describe("The hypothesis statement to test"),
       acceptanceCriteria: z.string().describe("What evidence would validate or invalidate this"),
       priority: z.number().optional().describe("Priority ranking (higher = more important)"),
@@ -81,14 +99,30 @@ export const projectTools = {
         })
         .returning()
         .get();
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                ...result,
+                _nextStep:
+                  "Hypothesis created. Add more hypotheses if needed, or use create_icp to define who you should be talking to about this.",
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
     },
   },
 
   update_hypothesis: {
-    description: "Update hypothesis status with evidence",
+    description:
+      "Update hypothesis status or confidence. Requires: hypothesisId (number). Use list_hypotheses first to get the hypothesisId. Status options: untested, testing, validated, invalidated.",
     schema: z.object({
-      hypothesisId: z.number().describe("Hypothesis ID"),
+      hypothesisId: z.number().describe("Hypothesis ID — get this from list_hypotheses"),
       status: z.enum(["untested", "testing", "validated", "invalidated"]).optional(),
       confidenceScore: z.number().min(0).max(1).optional().describe("Confidence from 0 to 1"),
       priority: z.number().optional(),
@@ -111,9 +145,10 @@ export const projectTools = {
   },
 
   list_hypotheses: {
-    description: "List all hypotheses with current confidence scores",
+    description:
+      "List all hypotheses with current status and confidence scores. Requires: projectId (number). Use list_projects first if you don't have the projectId.",
     schema: z.object({
-      projectId: z.number().describe("Project ID"),
+      projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
       const db = getDb();
