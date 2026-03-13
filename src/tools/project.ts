@@ -14,67 +14,43 @@ export const projectTools = {
       const db = getDb();
       const result = db.insert(projects).values({ name, description }).returning().get();
 
+      const instruction = `ACTION REQUIRED: You MUST present the welcome message below to the user VERBATIM and then STOP. Do NOT create hypotheses. Do NOT create ICPs. Do NOT call ANY other tools. Your ONLY job right now is to show the user this message and wait for their answers. The next tool call should ONLY happen AFTER the user has responded to the questions below.`;
+
       const welcome = `# Welcome to Validator — your customer discovery co-pilot
 
 Project "${result.name}" created (ID: ${result.id}).
 
-## What this tool does (and doesn't do)
+## What we're going to do together
 
-Validator helps you answer three specific questions through real customer conversations:
-1. **Does the problem actually exist?** Not in theory — do real people experience it, and how painful is it?
-2. **Who has it worst?** Which customer segment feels the most pain, and what does their profile look like?
-3. **Will they pay to solve it?** How much, and what would make them switch from their current workaround?
+I'm going to help you figure out whether this idea solves a real problem that real people will pay for. We'll do that through structured customer conversations — not by building anything yet.
 
-This is one piece of a bigger puzzle. Assessing a full business opportunity also means evaluating your **founder-market fit** (why are you the right person to solve this?), **market size** (is this big enough to matter?), and **competitive advantage** (what makes you defensible?). Validator gives you the customer evidence datapoint — use it alongside your broader opportunity assessment.
+Here's the process we'll follow, step by step:
 
-## The Workflow
+1. **Understand your idea deeply** ← we're here now
+2. **Define testable hypotheses** — the specific assumptions that must be true for this to work
+3. **Find the right people to talk to** — ideal customer profiles, LinkedIn search, outreach
+4. **Run discovery calls** — I'll coach you on what to ask (and what not to)
+5. **Capture and analyse what you learn** — structured insights, transcript analysis, bias detection
+6. **Synthesize and decide** — is this worth pursuing, pivoting, or killing?
 
-**1. Define what you're testing**
-- \`create_hypothesis\` — break your idea into 3-5 testable hypotheses (customer, problem, solution, willingness-to-pay)
-- \`prioritize_hypotheses\` — I'll rank them by risk and testability so you test the scariest assumption first
+**Important context:** This tool focuses on customer evidence — does the problem exist, who has it worst, and will they pay. You'll also want to think about founder-market fit, market size, and competitive advantage separately. Think of what we do here as one critical datapoint in your overall opportunity assessment.
 
-**2. Find people to talk to**
-- \`create_icp\` — define your ideal customer profile
-- \`suggest_channels\` — I'll suggest where these people hang out
-- \`search_linkedin\` — find specific people matching your ICP
-- \`add_contact\` — build your interview target list
+## But first — let's talk about your idea
 
-**3. Reach out**
-- \`generate_outreach\` — I'll draft short, no-pitch outreach messages
-- \`suggest_outreach_variant\` — A/B test different angles
-- \`get_outreach_stats\` — track what's working
+Before I generate any hypotheses, I need to properly understand what you're building and why. Getting the framing right now is the difference between testing the right things and wasting 20 conversations on the wrong questions.
 
-**4. Prepare and run calls**
-- \`generate_call_guide\` — tailored discussion guide following Mom Test principles
-- \`get_call_principles\` — quick reminder of what to do (and not do) on a call
+**Please answer these four questions:**
 
-**5. Capture what you learned**
-- \`start_debrief\` — structured post-call debrief
-- \`record_insight\` — capture individual insights with signal strength
-- \`analyze_transcript\` — paste a transcript and I'll extract insights, quotes, and flag bias automatically
-
-**6. Synthesize and decide**
-- \`synthesize_insights\` — patterns and contradictions across all calls
-- \`get_validation_scorecard\` — evidence for/against each hypothesis
-- \`detect_pivot_signals\` — am I solving the right problem for the right customer?
-- \`suggest_next_steps\` — what to do next based on current evidence
-
-## Let's start — but first, let's talk about your idea
-
-Before we jump into hypotheses, I want to make sure I understand what you're building and why. This conversation matters — getting the framing right now saves you from testing the wrong things later.
-
-IMPORTANT INSTRUCTION TO AI: You MUST present this entire welcome message to the user and then STOP. Do NOT immediately create hypotheses, ICPs, or call any other tools. Ask the user the following questions and wait for their answers before proceeding:
-
-1. **Who is this for?** Paint me a picture of the person who wakes up with this problem. What's their role? What kind of company are they at? What does their day look like?
-2. **What's the problem?** Not your solution — the problem. What are they doing today that's painful, slow, or broken? How are they currently dealing with it?
-3. **Why you?** What's your connection to this problem? Have you lived it? Do you have unique insight or access?
+1. **Who is this for?** Paint me a picture of the person who wakes up with this problem. What's their role? What kind of company are they at?
+2. **What's the problem?** Not your solution — the underlying problem. What are they doing today that's painful, slow, or broken?
+3. **Why you?** What's your connection to this problem? Have you lived it?
 4. **What's your biggest fear?** What's the one thing that, if it turned out to be false, would kill this idea?
 
-Take your time answering these. Your answers will shape everything that follows — the hypotheses we test, the people we talk to, and the questions we ask them.`;
+Take your time. Your answers will shape everything that follows.`;
 
       return {
         content: [
-          { type: "text" as const, text: JSON.stringify(result, null, 2) },
+          { type: "text" as const, text: instruction },
           { type: "text" as const, text: welcome },
         ],
       };
