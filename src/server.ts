@@ -32,7 +32,13 @@ const allTools = {
 };
 
 for (const [name, tool] of Object.entries(allTools)) {
-  server.tool(name, tool.description, tool.schema.shape, tool.handler as any);
+  const shape = tool.schema.shape;
+  if (Object.keys(shape).length === 0) {
+    // Tools with no parameters — use 3-arg overload
+    server.tool(name, tool.description, tool.handler as any);
+  } else {
+    server.tool(name, tool.description, shape, tool.handler as any);
+  }
 }
 
 // Register resources
