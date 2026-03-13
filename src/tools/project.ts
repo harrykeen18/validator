@@ -13,20 +13,59 @@ export const projectTools = {
     handler: async ({ name, description }: { name: string; description: string }) => {
       const db = getDb();
       const result = db.insert(projects).values({ name, description }).returning().get();
+
+      const welcome = `# Welcome to Validator — your customer discovery co-pilot
+
+Project "${result.name}" created (ID: ${result.id}).
+
+I'll help you validate this idea by talking to real customers, not by building. Here's how the process works:
+
+## The Workflow
+
+**1. Define what you're testing**
+- \`create_hypothesis\` — break your idea into 3-5 testable hypotheses (customer, problem, solution, willingness-to-pay)
+- \`prioritize_hypotheses\` — I'll rank them by risk and testability so you test the scariest assumption first
+
+**2. Find people to talk to**
+- \`create_icp\` — define your ideal customer profile
+- \`suggest_channels\` — I'll suggest where these people hang out
+- \`search_linkedin\` — find specific people matching your ICP
+- \`add_contact\` — build your interview target list
+
+**3. Reach out**
+- \`generate_outreach\` — I'll draft short, no-pitch outreach messages
+- \`suggest_outreach_variant\` — A/B test different angles
+- \`get_outreach_stats\` — track what's working
+
+**4. Prepare and run calls**
+- \`generate_call_guide\` — tailored discussion guide following Mom Test principles
+- \`get_call_principles\` — quick reminder of what to do (and not do) on a call
+
+**5. Capture what you learned**
+- \`start_debrief\` — structured post-call debrief
+- \`record_insight\` — capture individual insights with signal strength
+- \`analyze_transcript\` — paste a transcript and I'll extract insights, quotes, and flag bias automatically
+
+**6. Synthesize and decide**
+- \`synthesize_insights\` — patterns and contradictions across all calls
+- \`get_validation_scorecard\` — evidence for/against each hypothesis
+- \`detect_pivot_signals\` — am I solving the right problem for the right customer?
+- \`suggest_next_steps\` — what to do next based on current evidence
+
+## Let's start
+
+The first step is to break your idea into testable hypotheses. What are the core assumptions that must be true for "${result.name}" to work? Think about:
+- **Customer**: Who has this problem?
+- **Problem**: Is the problem real and painful enough?
+- **Solution**: Does your approach actually solve it?
+- **Viability**: Will people pay / switch / change behavior?
+
+Tell me your assumptions and I'll help turn them into testable hypotheses using \`create_hypothesis\`.`;
+
       return {
         content: [
-          {
-            type: "text" as const,
-            text: JSON.stringify(
-              {
-                ...result,
-                _nextStep:
-                  "Project created. Next: use create_hypothesis to add 3-5 testable hypotheses, then create_icp to define your ideal customer profile.",
-              },
-              null,
-              2
-            ),
-          },
+          { type: "text" as const, text: JSON.stringify(result, null, 2) },
+          { type: "text" as const, text: welcome },
         ],
       };
     },
