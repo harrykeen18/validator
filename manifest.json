@@ -1,0 +1,83 @@
+{
+  "manifest_version": "0.3",
+  "name": "validator",
+  "display_name": "Validator — Customer Discovery Co-Pilot",
+  "version": "0.1.0",
+  "description": "Validate startup ideas through structured customer conversations",
+  "long_description": "A customer discovery co-pilot that guides founders through hypothesis-driven validation. Helps you define testable assumptions, find the right people to talk to, run discovery calls using Mom Test principles, and synthesize what you learn into pivot-or-persevere decisions.",
+  "author": {
+    "name": "Harry Keen"
+  },
+  "icon": "icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "server/server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/server.js"
+      ],
+      "env": {
+        "TRANSPORT": "stdio",
+        "DB_MODE": "sqlite",
+        "DB_PATH": "${user_config.db_path}",
+        "ANTHROPIC_API_KEY": "${user_config.anthropic_api_key}"
+      }
+    }
+  },
+  "user_config": {
+    "anthropic_api_key": {
+      "type": "string",
+      "title": "Anthropic API Key",
+      "description": "Your Anthropic API key — used for AI-powered coaching features like call guides, transcript analysis, and next-step suggestions",
+      "required": true,
+      "sensitive": true
+    },
+    "db_path": {
+      "type": "string",
+      "title": "Database Path",
+      "description": "Where to store your validation data",
+      "required": false,
+      "default": "${HOME}/.validator/data.db"
+    }
+  },
+  "tools": [
+    { "name": "validate_idea", "description": "Start validating a new idea — presents the welcome and coaching questions" },
+    { "name": "create_project", "description": "Create a project record after the initial discussion" },
+    { "name": "list_projects", "description": "List all validation projects" },
+    { "name": "get_project_status", "description": "Full project overview with hypotheses, progress, and metrics" },
+    { "name": "create_hypothesis", "description": "Add a testable hypothesis with acceptance criteria" },
+    { "name": "update_hypothesis", "description": "Update hypothesis status or confidence" },
+    { "name": "list_hypotheses", "description": "List all hypotheses with status and confidence scores" },
+    { "name": "create_icp", "description": "Define an ideal customer profile" },
+    { "name": "add_contact", "description": "Add a potential interviewee to the target list" },
+    { "name": "list_contacts", "description": "List contacts for a project" },
+    { "name": "update_contact_status", "description": "Update contact status through the pipeline" },
+    { "name": "generate_outreach", "description": "Draft a personalised outreach message" },
+    { "name": "list_outreach", "description": "List outreach messages for a contact" },
+    { "name": "update_outreach_status", "description": "Track outreach message status" },
+    { "name": "get_outreach_stats", "description": "Outreach funnel metrics" },
+    { "name": "suggest_outreach_variant", "description": "Generate an alternative outreach angle" },
+    { "name": "generate_call_guide", "description": "Create a tailored discussion guide for a discovery call" },
+    { "name": "get_call_principles", "description": "Mom Test principles and anti-patterns reference" },
+    { "name": "start_debrief", "description": "Begin structured post-call debrief" },
+    { "name": "record_insight", "description": "Record an insight from a conversation" },
+    { "name": "analyze_transcript", "description": "AI analysis of a call transcript" },
+    { "name": "synthesize_insights", "description": "Find patterns across conversations" },
+    { "name": "get_validation_scorecard", "description": "Evidence summary across all hypotheses" },
+    { "name": "suggest_next_steps", "description": "AI-suggested next actions based on progress" },
+    { "name": "detect_pivot_signals", "description": "Analyse evidence for pivot indicators" },
+    { "name": "get_progress_report", "description": "Overall validation progress report" },
+    { "name": "prioritize_hypotheses", "description": "AI-powered hypothesis prioritisation" },
+    { "name": "search_linkedin", "description": "Find potential interviewees on LinkedIn" },
+    { "name": "get_linkedin_profile", "description": "Get LinkedIn profile details" },
+    { "name": "suggest_channels", "description": "Suggest channels to find your ICP" }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  },
+  "license": "MIT"
+}
