@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "Validate",
   "display_name": "Validate",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Validate startup ideas through structured customer conversations",
   "long_description": "A customer discovery co-pilot that guides founders through hypothesis-driven validation. Helps you define testable assumptions, find the right people to talk to, run discovery calls using Mom Test principles, and synthesize what you learn into pivot-or-persevere decisions.",
   "author": {
