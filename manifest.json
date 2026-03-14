@@ -1,7 +1,7 @@
 {
   "manifest_version": "0.3",
-  "name": "validator",
-  "display_name": "Validator — Customer Discovery Co-Pilot",
+  "name": "validate",
+  "display_name": "Validate",
   "version": "0.1.0",
   "description": "Validate startup ideas through structured customer conversations",
   "long_description": "A customer discovery co-pilot that guides founders through hypothesis-driven validation. Helps you define testable assumptions, find the right people to talk to, run discovery calls using Mom Test principles, and synthesize what you learn into pivot-or-persevere decisions.",
