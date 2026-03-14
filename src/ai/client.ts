@@ -20,7 +20,7 @@ export async function generateText(
   model: AiModel,
   systemPrompt: string,
   userMessage: string,
-  maxTokens = 2048
+  maxTokens = 2048,
 ): Promise<string> {
   const ai = getAiClient();
   const response = await ai.messages.create({

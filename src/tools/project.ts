@@ -1,6 +1,6 @@
-import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { getDb, projects, hypotheses, contacts, insights, conversations } from "../db/index.js";
+import { z } from "zod";
+import { contacts, conversations, getDb, hypotheses, insights, projects } from "../db/index.js";
 
 export const projectTools = {
   validate_idea: {
@@ -57,15 +57,14 @@ Here's the process we'll follow, step by step:
       const result = db.insert(projects).values({ name, description }).returning().get();
 
       return {
-        content: [
-          { type: "text" as const, text: JSON.stringify(result, null, 2) },
-        ],
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
       };
     },
   },
 
   list_projects: {
-    description: "List all active validation projects. No parameters required. Use this to find a projectId before calling other tools.",
+    description:
+      "List all active validation projects. No parameters required. Use this to find a projectId before calling other tools.",
     schema: z.object({}),
     handler: async () => {
       const db = getDb();
@@ -83,11 +82,23 @@ Here's the process we'll follow, step by step:
     handler: async ({ projectId }: { projectId: number }) => {
       const db = getDb();
       const project = db.select().from(projects).where(eq(projects.id, projectId)).get();
-      if (!project) return { content: [{ type: "text" as const, text: "Project not found. Use list_projects to see available projects." }] };
+      if (!project)
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: "Project not found. Use list_projects to see available projects.",
+            },
+          ],
+        };
 
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const conts = db.select().from(contacts).where(eq(contacts.projectId, projectId)).all();
-      const convs = db.select().from(conversations).where(eq(conversations.projectId, projectId)).all();
+      const convs = db
+        .select()
+        .from(conversations)
+        .where(eq(conversations.projectId, projectId))
+        .all();
       const ins = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
 
       const status = {
@@ -119,7 +130,12 @@ Here's the process we'll follow, step by step:
       acceptanceCriteria: z.string().describe("What evidence would validate or invalidate this"),
       priority: z.number().optional().describe("Priority ranking (higher = more important)"),
     }),
-    handler: async (args: { projectId: number; statement: string; acceptanceCriteria: string; priority?: number }) => {
+    handler: async (args: {
+      projectId: number;
+      statement: string;
+      acceptanceCriteria: string;
+      priority?: number;
+    }) => {
       const db = getDb();
       const result = db
         .insert(hypotheses)
@@ -132,9 +148,7 @@ Here's the process we'll follow, step by step:
         .returning()
         .get();
       return {
-        content: [
-          { type: "text" as const, text: JSON.stringify(result, null, 2) },
-        ],
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
       };
     },
   },
@@ -148,7 +162,12 @@ Here's the process we'll follow, step by step:
       confidenceScore: z.number().min(0).max(1).optional().describe("Confidence from 0 to 1"),
       priority: z.number().optional(),
     }),
-    handler: async (args: { hypothesisId: number; status?: string; confidenceScore?: number; priority?: number }) => {
+    handler: async (args: {
+      hypothesisId: number;
+      status?: string;
+      confidenceScore?: number;
+      priority?: number;
+    }) => {
       const db = getDb();
       const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
       if (args.status) updates.status = args.status;

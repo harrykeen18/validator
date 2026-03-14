@@ -1,8 +1,8 @@
-import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { getDb, hypotheses, insights, contacts, conversations } from "../db/index.js";
+import { z } from "zod";
 import { generateText } from "../ai/client.js";
 import { SYSTEM_PROMPTS } from "../ai/prompts.js";
+import { contacts, conversations, getDb, hypotheses, insights } from "../db/index.js";
 
 export const synthesisTools = {
   synthesize_insights: {
@@ -15,7 +15,11 @@ export const synthesisTools = {
       const db = getDb();
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
-      const convs = db.select().from(conversations).where(eq(conversations.projectId, projectId)).all();
+      const convs = db
+        .select()
+        .from(conversations)
+        .where(eq(conversations.projectId, projectId))
+        .all();
 
       if (allInsights.length === 0) {
         return {
@@ -39,16 +43,23 @@ All insights (${allInsights.length} total):
 ${allInsights
   .map(
     (i) =>
-      `- [Signal: ${i.signalStrength}, Direction: ${i.direction}, Hypothesis: ${i.hypothesisId || "general"}] ${i.content}${i.verbatimQuote ? ` (Quote: "${i.verbatimQuote}")` : ""}`
+      `- [Signal: ${i.signalStrength}, Direction: ${i.direction}, Hypothesis: ${i.hypothesisId || "general"}] ${i.content}${i.verbatimQuote ? ` (Quote: "${i.verbatimQuote}")` : ""}`,
   )
   .join("\n")}`;
 
-      const synthesis = await generateText("claude-opus-4-6", SYSTEM_PROMPTS.synthesis, userMessage, 4096);
+      const synthesis = await generateText(
+        "claude-opus-4-6",
+        SYSTEM_PROMPTS.synthesis,
+        userMessage,
+        4096,
+      );
       return {
         content: [
           {
             type: "text" as const,
-            text: synthesis + "\n\n---\n_Next: use suggest_next_steps for specific actions, or detect_pivot_signals if the evidence is pointing in an unexpected direction._",
+            text:
+              synthesis +
+              "\n\n---\n_Next: use suggest_next_steps for specific actions, or detect_pivot_signals if the evidence is pointing in an unexpected direction._",
           },
         ],
       };
@@ -116,7 +127,7 @@ ${allInsights
                   "Review your evidence. Hypotheses with strong contradicting signals may need to be invalidated via update_hypothesis. If you're unsure what to do next, use suggest_next_steps or detect_pivot_signals.",
               },
               null,
-              2
+              2,
             ),
           },
         ],
@@ -135,7 +146,11 @@ ${allInsights
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
       const conts = db.select().from(contacts).where(eq(contacts.projectId, projectId)).all();
-      const convs = db.select().from(conversations).where(eq(conversations.projectId, projectId)).all();
+      const convs = db
+        .select()
+        .from(conversations)
+        .where(eq(conversations.projectId, projectId))
+        .all();
 
       const userMessage = `Based on current validation progress, recommend next steps.
 
@@ -148,7 +163,11 @@ Contacts: ${conts.length} total, ${conts.filter((c) => c.status === "completed")
 Insight breakdown:
 ${allInsights.map((i) => `- [${i.signalStrength}/${i.direction}] ${i.content}`).join("\n")}`;
 
-      const nextSteps = await generateText("claude-sonnet-4-6", SYSTEM_PROMPTS.nextSteps, userMessage);
+      const nextSteps = await generateText(
+        "claude-sonnet-4-6",
+        SYSTEM_PROMPTS.nextSteps,
+        userMessage,
+      );
       return { content: [{ type: "text" as const, text: nextSteps }] };
     },
   },
@@ -184,11 +203,16 @@ All insights:
 ${allInsights
   .map(
     (i) =>
-      `- [Signal: ${i.signalStrength}, Direction: ${i.direction}] ${i.content}${i.verbatimQuote ? ` (Quote: "${i.verbatimQuote}")` : ""}`
+      `- [Signal: ${i.signalStrength}, Direction: ${i.direction}] ${i.content}${i.verbatimQuote ? ` (Quote: "${i.verbatimQuote}")` : ""}`,
   )
   .join("\n")}`;
 
-      const analysis = await generateText("claude-opus-4-6", SYSTEM_PROMPTS.pivotDetection, userMessage, 4096);
+      const analysis = await generateText(
+        "claude-opus-4-6",
+        SYSTEM_PROMPTS.pivotDetection,
+        userMessage,
+        4096,
+      );
       return { content: [{ type: "text" as const, text: analysis }] };
     },
   },
@@ -204,7 +228,11 @@ ${allInsights
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
       const conts = db.select().from(contacts).where(eq(contacts.projectId, projectId)).all();
-      const convs = db.select().from(conversations).where(eq(conversations.projectId, projectId)).all();
+      const convs = db
+        .select()
+        .from(conversations)
+        .where(eq(conversations.projectId, projectId))
+        .all();
 
       const report = {
         conversations: {
@@ -288,12 +316,18 @@ ${hyps
   })
   .join("\n")}`;
 
-      const ranking = await generateText("claude-sonnet-4-6", SYSTEM_PROMPTS.prioritizeHypotheses, userMessage);
+      const ranking = await generateText(
+        "claude-sonnet-4-6",
+        SYSTEM_PROMPTS.prioritizeHypotheses,
+        userMessage,
+      );
       return {
         content: [
           {
             type: "text" as const,
-            text: ranking + "\n\n---\n_Next: focus your upcoming calls on the top-priority hypothesis. Use generate_call_guide to build a discussion guide targeting it._",
+            text:
+              ranking +
+              "\n\n---\n_Next: focus your upcoming calls on the top-priority hypothesis. Use generate_call_guide to build a discussion guide targeting it._",
           },
         ],
       };

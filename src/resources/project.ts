@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { getDb, projects, hypotheses, insights, contacts } from "../db/index.js";
+import { contacts, getDb, hypotheses, insights, projects } from "../db/index.js";
 
 export function getProjectSummary(projectId: number): string {
   const db = getDb();
@@ -24,7 +24,7 @@ export function getProjectSummary(projectId: number): string {
       },
     },
     null,
-    2
+    2,
   );
 }
 
@@ -46,7 +46,7 @@ export function getProjectInsights(projectId: number): string {
   return JSON.stringify(
     db.select().from(insights).where(eq(insights.projectId, projectId)).all(),
     null,
-    2
+    2,
   );
 }
 
@@ -55,6 +55,6 @@ export function getProjectContacts(projectId: number): string {
   return JSON.stringify(
     db.select().from(contacts).where(eq(contacts.projectId, projectId)).all(),
     null,
-    2
+    2,
   );
 }

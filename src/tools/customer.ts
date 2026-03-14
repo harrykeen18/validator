@@ -1,6 +1,6 @@
-import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { getDb, icps, contacts } from "../db/index.js";
+import { z } from "zod";
+import { contacts, getDb, icps } from "../db/index.js";
 
 export const customerTools = {
   create_icp: {
@@ -36,9 +36,7 @@ export const customerTools = {
         .returning()
         .get();
       return {
-        content: [
-          { type: "text" as const, text: JSON.stringify(result, null, 2) },
-        ],
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
       };
     },
   },
@@ -54,7 +52,10 @@ export const customerTools = {
       role: z.string().optional().describe("Job title/role"),
       channel: z.string().optional().describe("How you found them or plan to reach them"),
       linkedinUrl: z.string().optional().describe("LinkedIn profile URL"),
-      notes: z.string().optional().describe("Any notes about this contact — the more context, the better the outreach"),
+      notes: z
+        .string()
+        .optional()
+        .describe("Any notes about this contact — the more context, the better the outreach"),
     }),
     handler: async (args: {
       projectId: number;
@@ -69,9 +70,7 @@ export const customerTools = {
       const db = getDb();
       const result = db.insert(contacts).values(args).returning().get();
       return {
-        content: [
-          { type: "text" as const, text: JSON.stringify(result, null, 2) },
-        ],
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
       };
     },
   },
@@ -88,7 +87,7 @@ export const customerTools = {
     }),
     handler: async ({ projectId, status }: { projectId: number; status?: string }) => {
       const db = getDb();
-      let query = db.select().from(contacts).where(eq(contacts.projectId, projectId));
+      const query = db.select().from(contacts).where(eq(contacts.projectId, projectId));
       const result = query.all();
       const filtered = status ? result.filter((c) => c.status === status) : result;
       return { content: [{ type: "text" as const, text: JSON.stringify(filtered, null, 2) }] };
@@ -115,10 +114,14 @@ export const customerTools = {
         .get();
 
       const nextStepMap: Record<string, string> = {
-        contacted: "Nice, let me know when they respond and I'll update their status. If no response in a few days, consider using suggest_outreach_variant for a follow-up.",
-        scheduled: "Great, a call is booked! Use generate_call_guide before the call to prepare a discussion guide tailored to this person.",
-        completed: "Call done! Use start_debrief to capture structured insights while the conversation is fresh, or analyze_transcript if you have a recording.",
-        declined: "No worries — not everyone will say yes. Focus on other contacts, or use search_linkedin to find more people matching your ICP.",
+        contacted:
+          "Nice, let me know when they respond and I'll update their status. If no response in a few days, consider using suggest_outreach_variant for a follow-up.",
+        scheduled:
+          "Great, a call is booked! Use generate_call_guide before the call to prepare a discussion guide tailored to this person.",
+        completed:
+          "Call done! Use start_debrief to capture structured insights while the conversation is fresh, or analyze_transcript if you have a recording.",
+        declined:
+          "No worries — not everyone will say yes. Focus on other contacts, or use search_linkedin to find more people matching your ICP.",
         identified: "Contact status reset. Use generate_outreach when you're ready to reach out.",
       };
 
@@ -126,11 +129,7 @@ export const customerTools = {
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify(
-              { ...result, _nextStep: nextStepMap[args.status] || "" },
-              null,
-              2
-            ),
+            text: JSON.stringify({ ...result, _nextStep: nextStepMap[args.status] || "" }, null, 2),
           },
         ],
       };

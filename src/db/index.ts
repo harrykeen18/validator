@@ -11,9 +11,7 @@ export function getDb(): Db {
     if (config.dbMode === "sqlite") {
       db = createSqliteDb(config.dbPath);
     } else {
-      throw new Error(
-        "PostgreSQL support not yet implemented. Use DB_MODE=sqlite."
-      );
+      throw new Error("PostgreSQL support not yet implemented. Use DB_MODE=sqlite.");
     }
   }
   return db;

@@ -1,8 +1,8 @@
-import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { getDb, icps, contacts } from "../db/index.js";
+import { z } from "zod";
 import { generateText } from "../ai/client.js";
 import { SYSTEM_PROMPTS } from "../ai/prompts.js";
+import { getDb, icps } from "../db/index.js";
 
 export const linkedinTools = {
   search_linkedin: {
@@ -40,7 +40,7 @@ Demographics: ${icp.demographics}
 Behaviors: ${icp.behaviors}
 Pain Points: ${icp.painPoints}
 Channels: ${icp.channels}
-${args.keywords ? `Additional context: ${args.keywords}` : ""}`
+${args.keywords ? `Additional context: ${args.keywords}` : ""}`,
       );
 
       let queries: { linkedinQueries: string[]; webSearchQueries: string[] };
@@ -54,7 +54,7 @@ ${args.keywords ? `Additional context: ${args.keywords}` : ""}`
       }
 
       const linkedinSearchUrls = queries.linkedinQueries.map(
-        (q) => `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}`
+        (q) => `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}`,
       );
 
       const response = {
@@ -95,7 +95,9 @@ Then act on whatever the user chooses.`,
     description:
       "Get details on a specific LinkedIn profile to inform outreach. Requires: linkedinUrl (string). Use this before generate_outreach to get context for personalizing the message.",
     schema: z.object({
-      linkedinUrl: z.string().describe("Full LinkedIn profile URL (e.g., https://www.linkedin.com/in/someone)"),
+      linkedinUrl: z
+        .string()
+        .describe("Full LinkedIn profile URL (e.g., https://www.linkedin.com/in/someone)"),
     }),
     handler: async ({ linkedinUrl }: { linkedinUrl: string }) => {
       const response = {
@@ -142,7 +144,7 @@ Known Channels: ${icp.channels}`;
       const suggestions = await generateText(
         "claude-sonnet-4-6",
         SYSTEM_PROMPTS.channelSuggestion,
-        userMessage
+        userMessage,
       );
       return { content: [{ type: "text" as const, text: suggestions }] };
     },

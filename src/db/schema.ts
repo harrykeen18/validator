@@ -1,16 +1,12 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
+import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const projects = sqliteTable("projects", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   description: text("description").notNull(),
-  createdAt: text("created_at")
-    .notNull()
-    .default(sql`(datetime('now'))`),
-  updatedAt: text("updated_at")
-    .notNull()
-    .default(sql`(datetime('now'))`),
+  createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
+  updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
 });
 
 export const hypotheses = sqliteTable("hypotheses", {
@@ -27,12 +23,8 @@ export const hypotheses = sqliteTable("hypotheses", {
     .default("untested"),
   confidenceScore: real("confidence_score").default(0),
   priority: integer("priority").default(0),
-  createdAt: text("created_at")
-    .notNull()
-    .default(sql`(datetime('now'))`),
-  updatedAt: text("updated_at")
-    .notNull()
-    .default(sql`(datetime('now'))`),
+  createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
+  updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
 });
 
 export const icps = sqliteTable("icps", {
@@ -45,9 +37,7 @@ export const icps = sqliteTable("icps", {
   behaviors: text("behaviors").notNull(),
   painPoints: text("pain_points").notNull(),
   channels: text("channels").notNull(),
-  createdAt: text("created_at")
-    .notNull()
-    .default(sql`(datetime('now'))`),
+  createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });
 
 export const contacts = sqliteTable("contacts", {
@@ -67,9 +57,7 @@ export const contacts = sqliteTable("contacts", {
     .notNull()
     .default("identified"),
   notes: text("notes"),
-  createdAt: text("created_at")
-    .notNull()
-    .default(sql`(datetime('now'))`),
+  createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });
 
 export const outreachMessages = sqliteTable("outreach_messages", {
@@ -88,9 +76,7 @@ export const outreachMessages = sqliteTable("outreach_messages", {
     .default("draft"),
   sentAt: text("sent_at"),
   respondedAt: text("responded_at"),
-  createdAt: text("created_at")
-    .notNull()
-    .default(sql`(datetime('now'))`),
+  createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });
 
 export const conversations = sqliteTable("conversations", {
@@ -102,9 +88,7 @@ export const conversations = sqliteTable("conversations", {
   date: text("date").notNull(),
   rawTranscript: text("raw_transcript"),
   summary: text("summary"),
-  createdAt: text("created_at")
-    .notNull()
-    .default(sql`(datetime('now'))`),
+  createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });
 
 export const insights = sqliteTable("insights", {
@@ -122,7 +106,5 @@ export const insights = sqliteTable("insights", {
   direction: text("direction", {
     enum: ["supports", "contradicts", "neutral"],
   }).notNull(),
-  createdAt: text("created_at")
-    .notNull()
-    .default(sql`(datetime('now'))`),
+  createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });

@@ -1,23 +1,23 @@
+import crypto from "node:crypto";
+import http from "node:http";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import http from "node:http";
-import crypto from "node:crypto";
 import { loadConfig } from "./config.js";
-import { projectTools } from "./tools/project.js";
-import { customerTools } from "./tools/customer.js";
-import { outreachTools } from "./tools/outreach.js";
-import { coachingTools } from "./tools/coaching.js";
-import { synthesisTools } from "./tools/synthesis.js";
-import { linkedinTools } from "./tools/linkedin.js";
 import { mcpPrompts } from "./prompts/index.js";
+import { ANTI_PATTERNS, HARRY_TIPS, MOM_TEST_PRINCIPLES } from "./resources/methodology.js";
 import {
-  getProjectSummary,
+  getProjectContacts,
   getProjectHypotheses,
   getProjectInsights,
-  getProjectContacts,
+  getProjectSummary,
 } from "./resources/project.js";
-import { MOM_TEST_PRINCIPLES, ANTI_PATTERNS, HARRY_TIPS } from "./resources/methodology.js";
+import { coachingTools } from "./tools/coaching.js";
+import { customerTools } from "./tools/customer.js";
+import { linkedinTools } from "./tools/linkedin.js";
+import { outreachTools } from "./tools/outreach.js";
+import { projectTools } from "./tools/project.js";
+import { synthesisTools } from "./tools/synthesis.js";
 
 function createServer(): McpServer {
   const server = new McpServer({
@@ -50,9 +50,11 @@ function createServer(): McpServer {
     "validator://project/{id}/summary",
     { description: "Current project state overview" },
     async (uri) => {
-      const id = parseInt(uri.pathname.split("/")[2]);
-      return { contents: [{ uri: uri.href, text: getProjectSummary(id), mimeType: "application/json" }] };
-    }
+      const id = parseInt(uri.pathname.split("/")[2], 10);
+      return {
+        contents: [{ uri: uri.href, text: getProjectSummary(id), mimeType: "application/json" }],
+      };
+    },
   );
 
   server.resource(
@@ -60,9 +62,11 @@ function createServer(): McpServer {
     "validator://project/{id}/hypotheses",
     { description: "All hypotheses with status and evidence" },
     async (uri) => {
-      const id = parseInt(uri.pathname.split("/")[2]);
-      return { contents: [{ uri: uri.href, text: getProjectHypotheses(id), mimeType: "application/json" }] };
-    }
+      const id = parseInt(uri.pathname.split("/")[2], 10);
+      return {
+        contents: [{ uri: uri.href, text: getProjectHypotheses(id), mimeType: "application/json" }],
+      };
+    },
   );
 
   server.resource(
@@ -70,9 +74,11 @@ function createServer(): McpServer {
     "validator://project/{id}/insights",
     { description: "All recorded insights across calls" },
     async (uri) => {
-      const id = parseInt(uri.pathname.split("/")[2]);
-      return { contents: [{ uri: uri.href, text: getProjectInsights(id), mimeType: "application/json" }] };
-    }
+      const id = parseInt(uri.pathname.split("/")[2], 10);
+      return {
+        contents: [{ uri: uri.href, text: getProjectInsights(id), mimeType: "application/json" }],
+      };
+    },
   );
 
   server.resource(
@@ -80,9 +86,11 @@ function createServer(): McpServer {
     "validator://project/{id}/contacts",
     { description: "Contact list with statuses" },
     async (uri) => {
-      const id = parseInt(uri.pathname.split("/")[2]);
-      return { contents: [{ uri: uri.href, text: getProjectContacts(id), mimeType: "application/json" }] };
-    }
+      const id = parseInt(uri.pathname.split("/")[2], 10);
+      return {
+        contents: [{ uri: uri.href, text: getProjectContacts(id), mimeType: "application/json" }],
+      };
+    },
   );
 
   server.resource(
@@ -91,7 +99,7 @@ function createServer(): McpServer {
     { description: "Mom Test principles reference" },
     async (uri) => ({
       contents: [{ uri: uri.href, text: MOM_TEST_PRINCIPLES, mimeType: "text/markdown" }],
-    })
+    }),
   );
 
   server.resource(
@@ -100,7 +108,7 @@ function createServer(): McpServer {
     { description: "Common founder mistakes in discovery" },
     async (uri) => ({
       contents: [{ uri: uri.href, text: ANTI_PATTERNS, mimeType: "text/markdown" }],
-    })
+    }),
   );
 
   server.resource(
@@ -109,7 +117,7 @@ function createServer(): McpServer {
     { description: "Practical tips on outreach, call techniques, and staying objective" },
     async (uri) => ({
       contents: [{ uri: uri.href, text: HARRY_TIPS, mimeType: "text/markdown" }],
-    })
+    }),
   );
 
   // Register prompts
@@ -128,7 +136,10 @@ const config = loadConfig();
 if (config.transport === "sse") {
   const port = config.port;
 
-  const sessions = new Map<string, { transport: StreamableHTTPServerTransport; server: McpServer }>();
+  const sessions = new Map<
+    string,
+    { transport: StreamableHTTPServerTransport; server: McpServer }
+  >();
 
   const httpServer = http.createServer(async (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -159,7 +170,13 @@ if (config.transport === "sse") {
 
       if (sessionId && !sessions.has(sessionId)) {
         res.writeHead(404, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ jsonrpc: "2.0", error: { code: -32000, message: "Session not found. Please reconnect." }, id: null }));
+        res.end(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            error: { code: -32000, message: "Session not found. Please reconnect." },
+            id: null,
+          }),
+        );
         return;
       }
 

@@ -1,7 +1,8 @@
 export const mcpPrompts = {
   "start-validation": {
     name: "start-validation",
-    description: "Kick off validation — guides founder through idea crystallization and hypothesis generation",
+    description:
+      "Kick off validation — guides founder through idea crystallization and hypothesis generation",
     arguments: [
       {
         name: "idea",

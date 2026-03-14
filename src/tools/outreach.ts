@@ -1,8 +1,8 @@
+import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { eq, and } from "drizzle-orm";
-import { getDb, outreachMessages, contacts } from "../db/index.js";
 import { generateText } from "../ai/client.js";
 import { SYSTEM_PROMPTS } from "../ai/prompts.js";
+import { contacts, getDb, outreachMessages } from "../db/index.js";
 
 export const outreachTools = {
   generate_outreach: {
@@ -11,12 +11,25 @@ export const outreachTools = {
     schema: z.object({
       contactId: z.number().describe("Contact ID — get this from add_contact or list_contacts"),
       channel: z.enum(["email", "linkedin", "twitter", "community"]).describe("Outreach channel"),
-      context: z.string().optional().describe("Additional context: something specific about this person that can personalize the message (e.g., a blog post they wrote, a talk they gave)"),
+      context: z
+        .string()
+        .optional()
+        .describe(
+          "Additional context: something specific about this person that can personalize the message (e.g., a blog post they wrote, a talk they gave)",
+        ),
     }),
     handler: async (args: { contactId: number; channel: string; context?: string }) => {
       const db = getDb();
       const contact = db.select().from(contacts).where(eq(contacts.id, args.contactId)).get();
-      if (!contact) return { content: [{ type: "text" as const, text: "Contact not found. Use add_contact to add them first, or list_contacts to find the right contactId." }] };
+      if (!contact)
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: "Contact not found. Use add_contact to add them first, or list_contacts to find the right contactId.",
+            },
+          ],
+        };
 
       const userMessage = `Generate a ${args.channel} outreach message for:
 Name: ${contact.name}
@@ -49,7 +62,7 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
                   "Here's your draft — but you'll want to manually edit it to add a genuine personal touch. AI-generated messages are a starting point, not the final version. Once you're happy, send it yourself and let me know so I'll log it with update_outreach_status. Tip: cold outreach response rates will be low, but that's fine — the response rate itself is signal. Bolster with 1st and 2nd degree connections too. If you want a different angle, use suggest_outreach_variant.",
               },
               null,
-              2
+              2,
             ),
           },
         ],
@@ -61,7 +74,10 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
     description:
       "View all outreach messages with send status and response tracking. Optional: filter by contactId (number).",
     schema: z.object({
-      contactId: z.number().optional().describe("Filter by contact ID — get this from list_contacts"),
+      contactId: z
+        .number()
+        .optional()
+        .describe("Filter by contact ID — get this from list_contacts"),
     }),
     handler: async ({ contactId }: { contactId?: number }) => {
       const db = getDb();
@@ -76,7 +92,9 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
     description:
       "Update the status of an outreach message. Requires: outreachId (number), status (draft/sent/responded/no_response/booked). Use list_outreach first to get the outreachId.",
     schema: z.object({
-      outreachId: z.number().describe("Outreach message ID — get this from generate_outreach or list_outreach"),
+      outreachId: z
+        .number()
+        .describe("Outreach message ID — get this from generate_outreach or list_outreach"),
       status: z.enum(["draft", "sent", "responded", "no_response", "booked"]),
     }),
     handler: async (args: { outreachId: number; status: string }) => {
@@ -94,9 +112,12 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
 
       const nextStepMap: Record<string, string> = {
         sent: "Logged as sent. Let me know when they respond — or if no reply in a few days, I can help draft a follow-up.",
-        responded: "They responded! If they're up for a call, update the contact status to 'scheduled' with update_contact_status. Then use generate_call_guide to prep.",
-        no_response: "No response logged. Want me to generate a follow-up variant with suggest_outreach_variant?",
-        booked: "Call booked! Use update_contact_status to mark them as 'scheduled', then generate_call_guide to prepare your discussion guide.",
+        responded:
+          "They responded! If they're up for a call, update the contact status to 'scheduled' with update_contact_status. Then use generate_call_guide to prep.",
+        no_response:
+          "No response logged. Want me to generate a follow-up variant with suggest_outreach_variant?",
+        booked:
+          "Call booked! Use update_contact_status to mark them as 'scheduled', then generate_call_guide to prepare your discussion guide.",
         draft: "Reset to draft.",
       };
 
@@ -104,11 +125,7 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify(
-              { ...result, _nextStep: nextStepMap[args.status] || "" },
-              null,
-              2
-            ),
+            text: JSON.stringify({ ...result, _nextStep: nextStepMap[args.status] || "" }, null, 2),
           },
         ],
       };
@@ -123,7 +140,10 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
       const db = getDb();
       const all = db.select().from(outreachMessages).all();
 
-      const byChannel: Record<string, { total: number; sent: number; responded: number; booked: number }> = {};
+      const byChannel: Record<
+        string,
+        { total: number; sent: number; responded: number; booked: number }
+      > = {};
       for (const msg of all) {
         if (!byChannel[msg.channel]) {
           byChannel[msg.channel] = { total: 0, sent: 0, responded: 0, booked: 0 };
@@ -137,7 +157,10 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
       const stats = Object.entries(byChannel).map(([channel, data]) => ({
         channel,
         ...data,
-        responseRate: data.sent > 0 ? ((data.responded + data.booked) / data.sent * 100).toFixed(1) + "%" : "N/A",
+        responseRate:
+          data.sent > 0
+            ? `${(((data.responded + data.booked) / data.sent) * 100).toFixed(1)}%`
+            : "N/A",
       }));
 
       return {
@@ -153,7 +176,7 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
                     : "No outreach sent yet. Use generate_outreach to create your first message.",
               },
               null,
-              2
+              2,
             ),
           },
         ],
@@ -165,13 +188,34 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
     description:
       "Generate an A/B variant of an existing outreach message with a different angle. Requires: outreachId (number). Use list_outreach first to get the outreachId. Optional: instruction (string) for specific direction.",
     schema: z.object({
-      outreachId: z.number().describe("Original outreach message ID — get this from generate_outreach or list_outreach"),
-      instruction: z.string().optional().describe("Specific instruction for the variant (e.g., 'try a more casual tone', 'reference their recent blog post')"),
+      outreachId: z
+        .number()
+        .describe(
+          "Original outreach message ID — get this from generate_outreach or list_outreach",
+        ),
+      instruction: z
+        .string()
+        .optional()
+        .describe(
+          "Specific instruction for the variant (e.g., 'try a more casual tone', 'reference their recent blog post')",
+        ),
     }),
     handler: async (args: { outreachId: number; instruction?: string }) => {
       const db = getDb();
-      const original = db.select().from(outreachMessages).where(eq(outreachMessages.id, args.outreachId)).get();
-      if (!original) return { content: [{ type: "text" as const, text: "Outreach message not found. Use list_outreach to see available messages." }] };
+      const original = db
+        .select()
+        .from(outreachMessages)
+        .where(eq(outreachMessages.id, args.outreachId))
+        .get();
+      if (!original)
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: "Outreach message not found. Use list_outreach to see available messages.",
+            },
+          ],
+        };
 
       const contact = db.select().from(contacts).where(eq(contacts.id, original.contactId)).get();
 
@@ -207,7 +251,7 @@ ${args.instruction ? `Specific instruction: ${args.instruction}` : "Try a differ
                   "Here's the variant. Send whichever version you prefer, then let me know and I'll log it with update_outreach_status.",
               },
               null,
-              2
+              2,
             ),
           },
         ],

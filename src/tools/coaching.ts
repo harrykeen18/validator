@@ -1,9 +1,9 @@
-import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { getDb, hypotheses, contacts, conversations, insights } from "../db/index.js";
+import { z } from "zod";
 import { generateText } from "../ai/client.js";
 import { SYSTEM_PROMPTS } from "../ai/prompts.js";
-import { MOM_TEST_PRINCIPLES, HARRY_TIPS } from "../resources/methodology.js";
+import { contacts, conversations, getDb, hypotheses, insights } from "../db/index.js";
+import { HARRY_TIPS, MOM_TEST_PRINCIPLES } from "../resources/methodology.js";
 
 export const coachingTools = {
   generate_call_guide: {
@@ -16,7 +16,15 @@ export const coachingTools = {
     handler: async (args: { projectId: number; contactId: number }) => {
       const db = getDb();
       const contact = db.select().from(contacts).where(eq(contacts.id, args.contactId)).get();
-      if (!contact) return { content: [{ type: "text" as const, text: "Contact not found. Use add_contact to add them first, or list_contacts to find the right contactId." }] };
+      if (!contact)
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: "Contact not found. Use add_contact to add them first, or list_contacts to find the right contactId.",
+            },
+          ],
+        };
 
       const hyps = db
         .select()
@@ -51,7 +59,9 @@ ${hyps.map((h, i) => `${i + 1}. ${h.statement} (Acceptance criteria: ${h.accepta
         content: [
           {
             type: "text" as const,
-            text: guide + "\n\n---\n_Next step: Review the guide, then go have your conversation. Afterwards, use start_debrief to capture what you learned while it's fresh._",
+            text:
+              guide +
+              "\n\n---\n_Next step: Review the guide, then go have your conversation. Afterwards, use start_debrief to capture what you learned while it's fresh._",
           },
         ],
       };
@@ -116,7 +126,7 @@ Let's be rigorous here:
 - What did they **actually say** about this? Try to remember their exact words.
 - Did they describe **past behavior** (strong signal) or just share an **opinion** (weaker)?
 - Does what they said **support**, **contradict**, or say **nothing** about this hypothesis?
-- Be honest about signal strength: "I spent 3 hours last week doing X manually" = strong. "Yeah that sounds like it could be useful" = weak.`
+- Be honest about signal strength: "I spent 3 hours last week doing X manually" = strong. "Yeah that sounds like it could be useful" = weak.`,
   )
   .join("\n\n")}
 
@@ -140,13 +150,25 @@ If you have a recording or transcript, you can also use analyze_transcript and I
     description:
       "Capture a specific insight from a conversation. Requires: projectId (number), content (string), signalStrength (strong/medium/weak), direction (supports/contradicts/neutral). Optional: conversationId (from start_debrief), hypothesisId (from list_hypotheses), verbatimQuote. Call start_debrief first to get a conversationId, or use without one for ad-hoc insights.",
     schema: z.object({
-      conversationId: z.number().optional().describe("Conversation ID — get this from start_debrief"),
+      conversationId: z
+        .number()
+        .optional()
+        .describe("Conversation ID — get this from start_debrief"),
       projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
-      hypothesisId: z.number().optional().describe("Hypothesis ID this insight relates to — get this from list_hypotheses"),
+      hypothesisId: z
+        .number()
+        .optional()
+        .describe("Hypothesis ID this insight relates to — get this from list_hypotheses"),
       content: z.string().describe("The insight itself"),
       verbatimQuote: z.string().optional().describe("Exact quote from the conversation"),
-      signalStrength: z.enum(["strong", "medium", "weak"]).describe("strong = past behavior/money spent, medium = specific preference, weak = opinion/future promise"),
-      direction: z.enum(["supports", "contradicts", "neutral"]).describe("Does this support or contradict the hypothesis?"),
+      signalStrength: z
+        .enum(["strong", "medium", "weak"])
+        .describe(
+          "strong = past behavior/money spent, medium = specific preference, weak = opinion/future promise",
+        ),
+      direction: z
+        .enum(["supports", "contradicts", "neutral"])
+        .describe("Does this support or contradict the hypothesis?"),
     }),
     handler: async (args: {
       conversationId?: number;
@@ -182,7 +204,7 @@ If you have a recording or transcript, you can also use analyze_transcript and I
                   "Insight recorded. Capture more insights from this conversation, or if you're done debriefing, use update_contact_status to mark the contact as 'completed'.",
               },
               null,
-              2
+              2,
             ),
           },
         ],
@@ -195,12 +217,19 @@ If you have a recording or transcript, you can also use analyze_transcript and I
       "Analyze a call transcript — extracts structured insights, verbatim quotes, hypothesis evidence, and flags interviewer bias. Requires: projectId (number), transcript (string). Optional: conversationId (from start_debrief) to link insights to a conversation. The project should have hypotheses so the analysis can map evidence to them.",
     schema: z.object({
       projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
-      conversationId: z.number().optional().describe("Conversation ID — get this from start_debrief to link insights to this call"),
+      conversationId: z
+        .number()
+        .optional()
+        .describe("Conversation ID — get this from start_debrief to link insights to this call"),
       transcript: z.string().describe("The full call transcript text"),
     }),
     handler: async (args: { projectId: number; conversationId?: number; transcript: string }) => {
       const db = getDb();
-      const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, args.projectId)).all();
+      const hyps = db
+        .select()
+        .from(hypotheses)
+        .where(eq(hypotheses.projectId, args.projectId))
+        .all();
 
       const userMessage = `Analyze this customer discovery transcript.
 
@@ -214,7 +243,7 @@ ${args.transcript}`;
         "claude-opus-4-6",
         SYSTEM_PROMPTS.transcriptAnalysis,
         userMessage,
-        4096
+        4096,
       );
 
       // Store transcript in conversation if we have one
@@ -249,9 +278,10 @@ ${args.transcript}`;
         // If not valid JSON, return raw analysis
       }
 
-      const nextStep = insightsSaved > 0
-        ? `\n\n---\n_${insightsSaved} insights auto-saved. Next: use update_contact_status to mark the contact as "completed", then get_validation_scorecard to see how your hypotheses are looking overall._`
-        : "\n\n---\n_Next: use record_insight to manually save the key findings from this analysis, then update_contact_status to mark the contact as \"completed\"._";
+      const nextStep =
+        insightsSaved > 0
+          ? `\n\n---\n_${insightsSaved} insights auto-saved. Next: use update_contact_status to mark the contact as "completed", then get_validation_scorecard to see how your hypotheses are looking overall._`
+          : '\n\n---\n_Next: use record_insight to manually save the key findings from this analysis, then update_contact_status to mark the contact as "completed"._';
 
       return { content: [{ type: "text" as const, text: analysis + nextStep }] };
     },
