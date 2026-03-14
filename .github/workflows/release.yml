@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - run: npm install
       - run: npm run bundle
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
