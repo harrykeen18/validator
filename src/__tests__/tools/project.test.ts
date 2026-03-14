@@ -1,8 +1,5 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createSqliteDb } from "../../db/sqlite.js";
-import * as schema from "../../db/schema.js";
 
 // Mock getDb to return an in-memory database
 let testDb: ReturnType<typeof createSqliteDb>;

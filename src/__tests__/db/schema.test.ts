@@ -105,7 +105,11 @@ describe("database schema", () => {
     const db = createTestDb();
 
     // Insert a project first
-    const project = db.insert(schema.projects).values({ name: "Test", description: "Desc" }).returning().get();
+    const project = db
+      .insert(schema.projects)
+      .values({ name: "Test", description: "Desc" })
+      .returning()
+      .get();
 
     // Should succeed with valid project_id
     const hyp = db
@@ -135,7 +139,11 @@ describe("database schema", () => {
 
   it("enforces foreign key from contacts to projects and icps", () => {
     const db = createTestDb();
-    const project = db.insert(schema.projects).values({ name: "P", description: "D" }).returning().get();
+    const project = db
+      .insert(schema.projects)
+      .values({ name: "P", description: "D" })
+      .returning()
+      .get();
     const icp = db
       .insert(schema.icps)
       .values({
@@ -169,7 +177,11 @@ describe("database schema", () => {
 
   it("sets default values for status and timestamps", () => {
     const db = createTestDb();
-    const project = db.insert(schema.projects).values({ name: "Test", description: "D" }).returning().get();
+    const project = db
+      .insert(schema.projects)
+      .values({ name: "Test", description: "D" })
+      .returning()
+      .get();
 
     expect(project.createdAt).toBeTruthy();
     expect(project.updatedAt).toBeTruthy();

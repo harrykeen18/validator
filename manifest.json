@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "Validate",
   "display_name": "Validate",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Validate startup ideas through structured customer conversations",
   "long_description": "A customer discovery co-pilot that guides founders through hypothesis-driven validation. Helps you define testable assumptions, find the right people to talk to, run discovery calls using Mom Test principles, and synthesize what you learn into pivot-or-persevere decisions.",
   "author": {
@@ -14,9 +14,7 @@
     "entry_point": "server/server.js",
     "mcp_config": {
       "command": "node",
-      "args": [
-        "${__dirname}/server/server.js"
-      ],
+      "args": ["${__dirname}/server/server.js"],
       "env": {
         "TRANSPORT": "stdio",
         "DB_MODE": "sqlite",
@@ -42,24 +40,48 @@
     }
   },
   "tools": [
-    { "name": "validate_idea", "description": "Start validating a new idea — presents the welcome and coaching questions" },
-    { "name": "create_project", "description": "Create a project record after the initial discussion" },
+    {
+      "name": "validate_idea",
+      "description": "Start validating a new idea — presents the welcome and coaching questions"
+    },
+    {
+      "name": "create_project",
+      "description": "Create a project record after the initial discussion"
+    },
     { "name": "list_projects", "description": "List all validation projects" },
-    { "name": "get_project_status", "description": "Full project overview with hypotheses, progress, and metrics" },
-    { "name": "create_hypothesis", "description": "Add a testable hypothesis with acceptance criteria" },
+    {
+      "name": "get_project_status",
+      "description": "Full project overview with hypotheses, progress, and metrics"
+    },
+    {
+      "name": "create_hypothesis",
+      "description": "Add a testable hypothesis with acceptance criteria"
+    },
     { "name": "update_hypothesis", "description": "Update hypothesis status or confidence" },
-    { "name": "list_hypotheses", "description": "List all hypotheses with status and confidence scores" },
+    {
+      "name": "list_hypotheses",
+      "description": "List all hypotheses with status and confidence scores"
+    },
     { "name": "create_icp", "description": "Define an ideal customer profile" },
     { "name": "add_contact", "description": "Add a potential interviewee to the target list" },
     { "name": "list_contacts", "description": "List contacts for a project" },
-    { "name": "update_contact_status", "description": "Update contact status through the pipeline" },
+    {
+      "name": "update_contact_status",
+      "description": "Update contact status through the pipeline"
+    },
     { "name": "generate_outreach", "description": "Draft a personalised outreach message" },
     { "name": "list_outreach", "description": "List outreach messages for a contact" },
     { "name": "update_outreach_status", "description": "Track outreach message status" },
     { "name": "get_outreach_stats", "description": "Outreach funnel metrics" },
     { "name": "suggest_outreach_variant", "description": "Generate an alternative outreach angle" },
-    { "name": "generate_call_guide", "description": "Create a tailored discussion guide for a discovery call" },
-    { "name": "get_call_principles", "description": "Mom Test principles and anti-patterns reference" },
+    {
+      "name": "generate_call_guide",
+      "description": "Create a tailored discussion guide for a discovery call"
+    },
+    {
+      "name": "get_call_principles",
+      "description": "Mom Test principles and anti-patterns reference"
+    },
     { "name": "start_debrief", "description": "Begin structured post-call debrief" },
     { "name": "record_insight", "description": "Record an insight from a conversation" },
     { "name": "analyze_transcript", "description": "AI analysis of a call transcript" },

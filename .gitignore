@@ -3,6 +3,6 @@ dist/
 *.db
 .env
 .DS_Store
-test/
+test-calls/
 bundle/
 *.mcpb

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createSqliteDb } from "../../db/sqlite.js";
 import * as schema from "../../db/schema.js";
+import { createSqliteDb } from "../../db/sqlite.js";
 
 let testDb: ReturnType<typeof createSqliteDb>;
 
@@ -16,7 +16,11 @@ const { customerTools } = await import("../../tools/customer.js");
 
 // Helper to create a project directly via the DB
 function createProject() {
-  return testDb.insert(schema.projects).values({ name: "Test", description: "D" }).returning().get();
+  return testDb
+    .insert(schema.projects)
+    .values({ name: "Test", description: "D" })
+    .returning()
+    .get();
 }
 
 describe("customer tools", () => {
