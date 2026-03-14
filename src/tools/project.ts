@@ -62,18 +62,7 @@ Here's the process we'll follow, step by step:
 
       return {
         content: [
-          {
-            type: "text" as const,
-            text: JSON.stringify(
-              {
-                ...result,
-                _nextStep:
-                  "Project created. Now let's define the hypotheses we need to test. What are the riskiest assumptions about this idea?",
-              },
-              null,
-              2
-            ),
-          },
+          { type: "text" as const, text: JSON.stringify(result, null, 2) },
         ],
       };
     },
@@ -148,18 +137,7 @@ Here's the process we'll follow, step by step:
         .get();
       return {
         content: [
-          {
-            type: "text" as const,
-            text: JSON.stringify(
-              {
-                ...result,
-                _nextStep:
-                  "Hypothesis created. Add more hypotheses if needed, or use create_icp to define who you should be talking to about this.",
-              },
-              null,
-              2
-            ),
-          },
+          { type: "text" as const, text: JSON.stringify(result, null, 2) },
         ],
       };
     },

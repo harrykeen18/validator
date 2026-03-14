@@ -37,18 +37,7 @@ export const customerTools = {
         .get();
       return {
         content: [
-          {
-            type: "text" as const,
-            text: JSON.stringify(
-              {
-                ...result,
-                _nextStep:
-                  "ICP created. Next: use suggest_channels to find where these people hang out, or search_linkedin to find specific people to talk to, or add_contact to add people you already know.",
-              },
-              null,
-              2
-            ),
-          },
+          { type: "text" as const, text: JSON.stringify(result, null, 2) },
         ],
       };
     },
@@ -81,18 +70,7 @@ export const customerTools = {
       const result = db.insert(contacts).values(args).returning().get();
       return {
         content: [
-          {
-            type: "text" as const,
-            text: JSON.stringify(
-              {
-                ...result,
-                _nextStep:
-                  "Contact added. Next: use generate_outreach to draft a personalized message for this contact, or add more contacts first.",
-              },
-              null,
-              2
-            ),
-          },
+          { type: "text" as const, text: JSON.stringify(result, null, 2) },
         ],
       };
     },
