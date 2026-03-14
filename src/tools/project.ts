@@ -10,7 +10,13 @@ export const projectTools = {
       idea: z.string().describe("The user's startup/product idea to validate"),
     }),
     handler: async ({ idea }: { idea: string }) => {
-      const message = `# Welcome to Validator — your customer discovery co-pilot
+      const instructions = `Your job: copy the welcome message from the next content block VERBATIM into your response — every heading, bullet, and line. Do not summarise, rephrase, or skip any part of it.
+
+After the welcome message, add your own section where you summarise what the user has already told you about their idea and dig into the **underlying problem** — not the solution, but the pain. What's actually going wrong for people today? Why does it hurt? If the user has already explained the pain clearly, summarise your understanding and ask if they're ready to move on.
+
+Do NOT call create_project or any other tool yet. WAIT for the user to respond.`;
+
+      const welcome = `# Welcome to Validator — your customer discovery co-pilot
 
 I'm going to help you figure out whether **${idea}** solves a real problem that real people will pay for. We'll do that through structured customer conversations — not by building anything yet.
 
@@ -28,17 +34,12 @@ Here's the process we'll follow, step by step:
 ### How to get the most out of this coach
 
 - **Everything is tracked for you.** I keep a database of hypotheses, target contacts, outreach, and discovery call notes as we go. After a call, just paste the transcript or your notes straight into the chat and I'll extract the insights.
-- **Ask for coaching anytime.** Try things like "how do I run a discovery call?" or "how do I persuade people to take a call?" — I'm loaded with real advice from experienced founders on outreach, interviewing, and staying objective.
-
----
-
-Present EVERYTHING above to the user exactly as written. Then, based on what the user has already told you about their idea, summarise what you understand and dig into the **underlying problem** — not the solution, but the pain. What's actually going wrong for people today? Why does it hurt? If the user has already explained the pain clearly, summarise your understanding and ask if they're ready to move on.
-
-Do NOT call create_project or any other tool yet. WAIT for the user to respond.`;
+- **Ask for coaching anytime.** Try things like "how do I run a discovery call?" or "how do I persuade people to take a call?" — I'm loaded with real advice from experienced founders on outreach, interviewing, and staying objective.`;
 
       return {
         content: [
-          { type: "text" as const, text: message },
+          { type: "text" as const, text: instructions },
+          { type: "text" as const, text: welcome },
         ],
       };
     },
