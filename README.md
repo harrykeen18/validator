@@ -5,7 +5,7 @@
 <h1 align="center">Validate</h1>
 
 <p align="center">
-  A customer discovery co-pilot that plugs into Claude — guiding founders from raw idea through to product-market fit signals.
+  A customer discovery co-pilot that plugs into Claude. Guiding founders from raw idea through to product-market fit signals using objective, emotionless and logical discovery call techniques. Channel your inner Spock to PMF!
 </p>
 
 <p align="center">
