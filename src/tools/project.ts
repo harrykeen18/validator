@@ -10,24 +10,9 @@ export const projectTools = {
       idea: z.string().describe("The user's startup/product idea to validate"),
     }),
     handler: async ({ idea }: { idea: string }) => {
-      const instruction = `ACTION REQUIRED: Present the welcome message below to the user and then STOP. Do NOT call create_project. Do NOT create hypotheses. Do NOT create ICPs. Do NOT call ANY other tools yet.
+      const message = `# Welcome to Validator — your customer discovery co-pilot
 
-After presenting the welcome, review what the user has ALREADY told you about their idea ("${idea}") in the conversation so far. Summarise back to them what you understand about who it's for and what problem it solves. Then identify what's STILL UNCLEAR and only ask about those gaps. Do NOT re-ask questions the user has already answered.
-
-The key things you need to understand before moving to hypotheses are:
-- Who specifically has this problem (role, company type, context)
-- What the underlying problem is (not the solution — the pain)
-- What the riskiest assumption is (what would kill this idea if false)
-
-If the user has already covered all of these, skip the questions entirely — summarise your understanding, share any initial observations or concerns, and ask if they're ready to move on to defining hypotheses.
-
-IMPORTANT: After presenting the welcome and your questions, WAIT for the user to respond. Do NOT proceed to create_project or any other tool call.`;
-
-      const welcome = `# Welcome to Validator — your customer discovery co-pilot
-
-## What we're going to do together
-
-I'm going to help you figure out whether this idea solves a real problem that real people will pay for. We'll do that through structured customer conversations — not by building anything yet.
+I'm going to help you figure out whether **${idea}** solves a real problem that real people will pay for. We'll do that through structured customer conversations — not by building anything yet.
 
 Here's the process we'll follow, step by step:
 
@@ -38,12 +23,17 @@ Here's the process we'll follow, step by step:
 5. **Capture and analyse what you learn** — structured insights, transcript analysis, bias detection
 6. **Synthesize and decide** — is this worth pursuing, pivoting, or killing?
 
-**Important context:** This focuses on customer evidence — does the problem exist, who has it worst, and will they pay. You'll also want to assess founder-market fit, market size, and competitive advantage separately. Think of this as one critical datapoint in your overall opportunity assessment.`;
+**Important context:** This focuses on customer evidence — does the problem exist, who has it worst, and will they pay. You'll also want to assess founder-market fit, market size, and competitive advantage separately. Think of this as one critical datapoint in your overall opportunity assessment.
+
+---
+
+Present EVERYTHING above to the user exactly as written. Then, based on what the user has already told you about their idea, summarise what you understand and dig into the **underlying problem** — not the solution, but the pain. What's actually going wrong for people today? Why does it hurt? If the user has already explained the pain clearly, summarise your understanding and ask if they're ready to move on.
+
+Do NOT call create_project or any other tool yet. WAIT for the user to respond.`;
 
       return {
         content: [
-          { type: "text" as const, text: instruction },
-          { type: "text" as const, text: welcome },
+          { type: "text" as const, text: message },
         ],
       };
     },
