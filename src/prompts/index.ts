@@ -18,8 +18,8 @@ export const mcpPrompts = {
 
 IMPORTANT: This is a GUIDED, INTERACTIVE process. Do NOT rush through it. Follow these steps ONE AT A TIME, waiting for my input at each stage:
 
-**Step 1 — Create the project**
-Use create_project to set up the project. It will return a welcome message with an overview of the full process and some questions for me. STOP here and present the welcome message and questions to me. Wait for my answers.
+**Step 1 — Start the validation**
+Use start_validation with my idea. It will return a welcome message and coaching questions. STOP here and present the welcome message and questions to me. Wait for my answers. Do NOT call create_project yet.
 
 **Step 2 — Discuss and crystallize (ONLY after I've answered the Step 1 questions)**
 Based on my answers, help me crystallize:
@@ -27,13 +27,16 @@ Based on my answers, help me crystallize:
 - What are the riskiest unknowns?
 Talk this through with me. Share your honest take on the idea. Ask follow-up questions if my answers are vague. Do NOT create hypotheses yet.
 
-**Step 3 — Build hypotheses together (ONLY after we've had the Step 2 discussion)**
+**Step 3 — Create the project (ONLY after the Step 2 discussion)**
+Once we've discussed the idea thoroughly, use create_project to save the project record.
+
+**Step 4 — Build hypotheses together (ONLY after the project is created)**
 Now suggest 3-5 testable hypotheses based on our discussion. Present them to me FIRST for feedback before creating them. I might want to reword them or add/remove some. Once I'm happy, use create_hypothesis for each one, then prioritize_hypotheses to rank them.
 
-**Step 4 — Define the ICP (ONLY after hypotheses are set)**
+**Step 5 — Define the ICP (ONLY after hypotheses are set)**
 Based on the hypotheses, suggest an ideal customer profile. Discuss it with me, then use create_icp.
 
-**Step 5 — Plan first outreach**
+**Step 6 — Plan first outreach**
 Suggest next steps for finding people to talk to.
 
 Remember: this is a conversation, not a batch job. Be a coach — explain your thinking, challenge my assumptions, and make sure I'm bought into each step before moving on.`,

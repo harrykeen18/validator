@@ -3,31 +3,27 @@ import { eq } from "drizzle-orm";
 import { getDb, projects, hypotheses, contacts, insights, conversations } from "../db/index.js";
 
 export const projectTools = {
-  create_project: {
+  start_validation: {
     description:
-      "Initialize a new validation project. Requires: name, description. This is the first tool to call — most other tools need a projectId from this.",
+      "THIS IS THE FIRST TOOL TO CALL. Do not call create_project or any other tool until you have used this tool and had a conversation with the user. Takes the user's idea and returns a welcome message with coaching questions.",
     schema: z.object({
-      name: z.string().describe("Project name"),
-      description: z.string().describe("Describe the idea you want to validate"),
+      idea: z.string().describe("The user's startup/product idea to validate"),
     }),
-    handler: async ({ name, description }: { name: string; description: string }) => {
-      const db = getDb();
-      const result = db.insert(projects).values({ name, description }).returning().get();
+    handler: async ({ idea }: { idea: string }) => {
+      const instruction = `ACTION REQUIRED: Present the welcome message below to the user and then STOP. Do NOT call create_project. Do NOT create hypotheses. Do NOT create ICPs. Do NOT call ANY other tools yet.
 
-      const instruction = `ACTION REQUIRED: Present the welcome message below to the user and then STOP. Do NOT create hypotheses. Do NOT create ICPs. Do NOT call ANY other tools yet.
-
-After presenting the welcome, review what the user has ALREADY told you about their idea in the conversation so far. Summarise back to them what you understand about who it's for and what problem it solves. Then identify what's STILL UNCLEAR and only ask about those gaps. Do NOT re-ask questions the user has already answered.
+After presenting the welcome, review what the user has ALREADY told you about their idea ("${idea}") in the conversation so far. Summarise back to them what you understand about who it's for and what problem it solves. Then identify what's STILL UNCLEAR and only ask about those gaps. Do NOT re-ask questions the user has already answered.
 
 The key things you need to understand before moving to hypotheses are:
 - Who specifically has this problem (role, company type, context)
 - What the underlying problem is (not the solution — the pain)
 - What the riskiest assumption is (what would kill this idea if false)
 
-If the user has already covered all of these, skip the questions entirely — summarise your understanding, share any initial observations or concerns, and ask if they're ready to move on to defining hypotheses.`;
+If the user has already covered all of these, skip the questions entirely — summarise your understanding, share any initial observations or concerns, and ask if they're ready to move on to defining hypotheses.
+
+IMPORTANT: After presenting the welcome and your questions, WAIT for the user to respond. Do NOT proceed to create_project or any other tool call.`;
 
       const welcome = `# Welcome to Validator — your customer discovery co-pilot
-
-Project "${result.name}" created (ID: ${result.id}).
 
 ## What we're going to do together
 
@@ -48,6 +44,36 @@ Here's the process we'll follow, step by step:
         content: [
           { type: "text" as const, text: instruction },
           { type: "text" as const, text: welcome },
+        ],
+      };
+    },
+  },
+
+  create_project: {
+    description:
+      "Create a project record after the initial discussion. Call start_validation first to discuss the idea. Requires: name (string), description (string).",
+    schema: z.object({
+      name: z.string().describe("Project name"),
+      description: z.string().describe("Describe the idea you want to validate"),
+    }),
+    handler: async ({ name, description }: { name: string; description: string }) => {
+      const db = getDb();
+      const result = db.insert(projects).values({ name, description }).returning().get();
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                ...result,
+                _nextStep:
+                  "Project created. Now let's define the hypotheses we need to test. What are the riskiest assumptions about this idea?",
+              },
+              null,
+              2
+            ),
+          },
         ],
       };
     },
