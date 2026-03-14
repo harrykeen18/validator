@@ -19,7 +19,7 @@ export const mcpPrompts = {
 IMPORTANT: This is a GUIDED, INTERACTIVE process. Do NOT rush through it. Follow these steps ONE AT A TIME, waiting for my input at each stage:
 
 **Step 1 — Start the validation**
-Use start_validation with my idea. It will return a welcome message and coaching questions. STOP here and present the welcome message and questions to me. Wait for my answers. Do NOT call create_project yet.
+Use validate_idea with my idea. It will return a welcome message and coaching questions. STOP here and present the welcome message and questions to me. Wait for my answers. Do NOT call create_project yet.
 
 **Step 2 — Discuss and crystallize (ONLY after I've answered the Step 1 questions)**
 Based on my answers, help me crystallize:

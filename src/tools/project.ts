@@ -3,9 +3,9 @@ import { eq } from "drizzle-orm";
 import { getDb, projects, hypotheses, contacts, insights, conversations } from "../db/index.js";
 
 export const projectTools = {
-  start_validation: {
+  validate_idea: {
     description:
-      "THIS IS THE FIRST TOOL TO CALL. Do not call create_project or any other tool until you have used this tool and had a conversation with the user. Takes the user's idea and returns a welcome message with coaching questions.",
+      "THIS IS THE FIRST TOOL TO CALL. Do not call create_project or any other tool until you have used validate_idea and had a conversation with the user. Takes the user's idea and returns a welcome message with coaching questions.",
     schema: z.object({
       idea: z.string().describe("The user's startup/product idea to validate"),
     }),
@@ -41,7 +41,7 @@ Do NOT call create_project or any other tool yet. WAIT for the user to respond.`
 
   create_project: {
     description:
-      "Create a project record after the initial discussion. Call start_validation first to discuss the idea. Requires: name (string), description (string).",
+      "Create a project record after the initial discussion. Call validate_idea first to discuss the idea. Requires: name (string), description (string).",
     schema: z.object({
       name: z.string().describe("Project name"),
       description: z.string().describe("Describe the idea you want to validate"),
