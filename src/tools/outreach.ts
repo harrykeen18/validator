@@ -19,7 +19,7 @@ export const outreachTools = {
         ),
     }),
     handler: async (args: { contactId: number; channel: string; context?: string }) => {
-      const db = getDb();
+      const db = await getDb();
       const contact = db.select().from(contacts).where(eq(contacts.id, args.contactId)).get();
       if (!contact)
         return {
@@ -80,7 +80,7 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
         .describe("Filter by contact ID — get this from list_contacts"),
     }),
     handler: async ({ contactId }: { contactId?: number }) => {
-      const db = getDb();
+      const db = await getDb();
       const result = contactId
         ? db.select().from(outreachMessages).where(eq(outreachMessages.contactId, contactId)).all()
         : db.select().from(outreachMessages).all();
@@ -98,7 +98,7 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
       status: z.enum(["draft", "sent", "responded", "no_response", "booked"]),
     }),
     handler: async (args: { outreachId: number; status: string }) => {
-      const db = getDb();
+      const db = await getDb();
       const updates: Record<string, unknown> = { status: args.status };
       if (args.status === "sent") updates.sentAt = new Date().toISOString();
       if (args.status === "responded") updates.respondedAt = new Date().toISOString();
@@ -137,7 +137,7 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
       "Response rates by channel. No parameters required. Shows how your outreach is performing across email, LinkedIn, Twitter, and community channels.",
     schema: z.object({}),
     handler: async () => {
-      const db = getDb();
+      const db = await getDb();
       const all = db.select().from(outreachMessages).all();
 
       const byChannel: Record<
@@ -201,7 +201,7 @@ ${args.context ? `Additional context: ${args.context}` : ""}`;
         ),
     }),
     handler: async (args: { outreachId: number; instruction?: string }) => {
-      const db = getDb();
+      const db = await getDb();
       const original = db
         .select()
         .from(outreachMessages)

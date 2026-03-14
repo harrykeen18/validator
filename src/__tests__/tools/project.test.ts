@@ -1,23 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { SqliteDb } from "../../db/sqlite.js";
 import { createSqliteDb } from "../../db/sqlite.js";
 
-// Mock getDb to return an in-memory database
-let testDb: ReturnType<typeof createSqliteDb>;
+let testDb: SqliteDb;
 
 vi.mock("../../db/index.js", async () => {
   const actual = await vi.importActual<typeof import("../../db/schema.js")>("../../db/schema.js");
   return {
     ...actual,
-    getDb: () => testDb,
+    getDb: async () => testDb,
   };
 });
 
-// Import after mock setup
 const { projectTools } = await import("../../tools/project.js");
 
 describe("project tools", () => {
-  beforeEach(() => {
-    testDb = createSqliteDb(":memory:");
+  beforeEach(async () => {
+    testDb = await createSqliteDb(":memory:");
   });
 
   it("create_project returns the new project", async () => {

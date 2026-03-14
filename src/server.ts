@@ -52,7 +52,9 @@ function createServer(): McpServer {
     async (uri) => {
       const id = parseInt(uri.pathname.split("/")[2], 10);
       return {
-        contents: [{ uri: uri.href, text: getProjectSummary(id), mimeType: "application/json" }],
+        contents: [
+          { uri: uri.href, text: await getProjectSummary(id), mimeType: "application/json" },
+        ],
       };
     },
   );
@@ -64,7 +66,9 @@ function createServer(): McpServer {
     async (uri) => {
       const id = parseInt(uri.pathname.split("/")[2], 10);
       return {
-        contents: [{ uri: uri.href, text: getProjectHypotheses(id), mimeType: "application/json" }],
+        contents: [
+          { uri: uri.href, text: await getProjectHypotheses(id), mimeType: "application/json" },
+        ],
       };
     },
   );
@@ -76,7 +80,9 @@ function createServer(): McpServer {
     async (uri) => {
       const id = parseInt(uri.pathname.split("/")[2], 10);
       return {
-        contents: [{ uri: uri.href, text: getProjectInsights(id), mimeType: "application/json" }],
+        contents: [
+          { uri: uri.href, text: await getProjectInsights(id), mimeType: "application/json" },
+        ],
       };
     },
   );
@@ -88,7 +94,9 @@ function createServer(): McpServer {
     async (uri) => {
       const id = parseInt(uri.pathname.split("/")[2], 10);
       return {
-        contents: [{ uri: uri.href, text: getProjectContacts(id), mimeType: "application/json" }],
+        contents: [
+          { uri: uri.href, text: await getProjectContacts(id), mimeType: "application/json" },
+        ],
       };
     },
   );

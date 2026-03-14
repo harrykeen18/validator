@@ -5,11 +5,11 @@ export type Db = SqliteDb;
 
 let db: Db | null = null;
 
-export function getDb(): Db {
+export async function getDb(): Promise<Db> {
   if (!db) {
     const config = loadConfig();
     if (config.dbMode === "sqlite") {
-      db = createSqliteDb(config.dbPath);
+      db = await createSqliteDb(config.dbPath);
     } else {
       throw new Error("PostgreSQL support not yet implemented. Use DB_MODE=sqlite.");
     }

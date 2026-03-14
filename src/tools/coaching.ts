@@ -14,7 +14,7 @@ export const coachingTools = {
       contactId: z.number().describe("Contact ID — get this from list_contacts or add_contact"),
     }),
     handler: async (args: { projectId: number; contactId: number }) => {
-      const db = getDb();
+      const db = await getDb();
       const contact = db.select().from(contacts).where(eq(contacts.id, args.contactId)).get();
       if (!contact)
         return {
@@ -91,7 +91,7 @@ ${hyps.map((h, i) => `${i + 1}. ${h.statement} (Acceptance criteria: ${h.accepta
       date: z.string().optional().describe("Date of the call (YYYY-MM-DD). Defaults to today."),
     }),
     handler: async (args: { projectId: number; contactId: number; date?: string }) => {
-      const db = getDb();
+      const db = await getDb();
       const contact = db.select().from(contacts).where(eq(contacts.id, args.contactId)).get();
       const hyps = db
         .select()
@@ -179,7 +179,7 @@ If you have a recording or transcript, you can also use analyze_transcript and I
       signalStrength: "strong" | "medium" | "weak";
       direction: "supports" | "contradicts" | "neutral";
     }) => {
-      const db = getDb();
+      const db = await getDb();
       const result = db.insert(insights).values(args).returning().get();
 
       // If linked to a hypothesis and direction is clear, update hypothesis status to "testing"
@@ -224,7 +224,7 @@ If you have a recording or transcript, you can also use analyze_transcript and I
       transcript: z.string().describe("The full call transcript text"),
     }),
     handler: async (args: { projectId: number; conversationId?: number; transcript: string }) => {
-      const db = getDb();
+      const db = await getDb();
       const hyps = db
         .select()
         .from(hypotheses)

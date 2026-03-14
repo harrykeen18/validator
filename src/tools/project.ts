@@ -53,7 +53,7 @@ Here's the process we'll follow, step by step:
       description: z.string().describe("Describe the idea you want to validate"),
     }),
     handler: async ({ name, description }: { name: string; description: string }) => {
-      const db = getDb();
+      const db = await getDb();
       const result = db.insert(projects).values({ name, description }).returning().get();
 
       return {
@@ -67,7 +67,7 @@ Here's the process we'll follow, step by step:
       "List all active validation projects. No parameters required. Use this to find a projectId before calling other tools.",
     schema: z.object({}),
     handler: async () => {
-      const db = getDb();
+      const db = await getDb();
       const result = db.select().from(projects).all();
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     },
@@ -80,7 +80,7 @@ Here's the process we'll follow, step by step:
       projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
-      const db = getDb();
+      const db = await getDb();
       const project = db.select().from(projects).where(eq(projects.id, projectId)).get();
       if (!project)
         return {
@@ -136,7 +136,7 @@ Here's the process we'll follow, step by step:
       acceptanceCriteria: string;
       priority?: number;
     }) => {
-      const db = getDb();
+      const db = await getDb();
       const result = db
         .insert(hypotheses)
         .values({
@@ -168,7 +168,7 @@ Here's the process we'll follow, step by step:
       confidenceScore?: number;
       priority?: number;
     }) => {
-      const db = getDb();
+      const db = await getDb();
       const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
       if (args.status) updates.status = args.status;
       if (args.confidenceScore !== undefined) updates.confidenceScore = args.confidenceScore;
@@ -191,7 +191,7 @@ Here's the process we'll follow, step by step:
       projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
-      const db = getDb();
+      const db = await getDb();
       const result = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     },

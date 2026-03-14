@@ -22,7 +22,7 @@ export const customerTools = {
       painPoints: string;
       channels: string;
     }) => {
-      const db = getDb();
+      const db = await getDb();
       const result = db
         .insert(icps)
         .values({
@@ -67,7 +67,7 @@ export const customerTools = {
       linkedinUrl?: string;
       notes?: string;
     }) => {
-      const db = getDb();
+      const db = await getDb();
       const result = db.insert(contacts).values(args).returning().get();
       return {
         content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
@@ -86,7 +86,7 @@ export const customerTools = {
         .describe("Filter by status"),
     }),
     handler: async ({ projectId, status }: { projectId: number; status?: string }) => {
-      const db = getDb();
+      const db = await getDb();
       const query = db.select().from(contacts).where(eq(contacts.projectId, projectId));
       const result = query.all();
       const filtered = status ? result.filter((c) => c.status === status) : result;
@@ -103,7 +103,7 @@ export const customerTools = {
       notes: z.string().optional().describe("Additional notes"),
     }),
     handler: async (args: { contactId: number; status: string; notes?: string }) => {
-      const db = getDb();
+      const db = await getDb();
       const updates: Record<string, unknown> = { status: args.status };
       if (args.notes) updates.notes = args.notes;
       const result = db

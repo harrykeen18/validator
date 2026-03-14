@@ -1,14 +1,25 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import fs from "node:fs";
+import path from "node:path";
+import { drizzle } from "drizzle-orm/sql-js";
+import initSqlJs from "sql.js";
 import * as schema from "./schema.js";
 
-export function createSqliteDb(dbPath: string) {
-  const sqlite = new Database(dbPath);
-  sqlite.pragma("journal_mode = WAL");
-  sqlite.pragma("foreign_keys = ON");
+export async function createSqliteDb(dbPath: string) {
+  const SQL = await initSqlJs();
+
+  // Load existing database file if it exists, otherwise create new
+  let sqlite: InstanceType<typeof SQL.Database>;
+  if (dbPath !== ":memory:" && fs.existsSync(dbPath)) {
+    const buffer = fs.readFileSync(dbPath);
+    sqlite = new SQL.Database(buffer);
+  } else {
+    sqlite = new SQL.Database();
+  }
+
+  sqlite.run("PRAGMA foreign_keys = ON");
 
   // Create tables if they don't exist
-  sqlite.exec(`
+  sqlite.run(`
     CREATE TABLE IF NOT EXISTS projects (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -88,7 +99,25 @@ export function createSqliteDb(dbPath: string) {
     );
   `);
 
-  return drizzle(sqlite, { schema });
+  const db = drizzle(sqlite, { schema });
+
+  // Persist to disk after each mutation if using a file path
+  if (dbPath !== ":memory:") {
+    const dir = path.dirname(dbPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    const originalRun = db.run.bind(db);
+    db.run = ((query: any) => {
+      const result = originalRun(query);
+      const data = sqlite.export();
+      fs.writeFileSync(dbPath, Buffer.from(data));
+      return result;
+    }) as typeof db.run;
+  }
+
+  return db;
 }
 
-export type SqliteDb = ReturnType<typeof createSqliteDb>;
+export type SqliteDb = Awaited<ReturnType<typeof createSqliteDb>>;

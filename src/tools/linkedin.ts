@@ -13,7 +13,7 @@ export const linkedinTools = {
       keywords: z.string().optional().describe("Additional search keywords"),
     }),
     handler: async (args: { icpId: number; keywords?: string }) => {
-      const db = getDb();
+      const db = await getDb();
       const icp = db.select().from(icps).where(eq(icps.id, args.icpId)).get();
       if (!icp) return { content: [{ type: "text" as const, text: "ICP not found" }] };
 
@@ -129,7 +129,7 @@ Then act on whatever the user chooses.`,
       icpId: z.number().describe("ICP ID — get this from create_icp"),
     }),
     handler: async ({ icpId }: { icpId: number }) => {
-      const db = getDb();
+      const db = await getDb();
       const icp = db.select().from(icps).where(eq(icps.id, icpId)).get();
       if (!icp) return { content: [{ type: "text" as const, text: "ICP not found" }] };
 

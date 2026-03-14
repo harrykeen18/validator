@@ -12,7 +12,7 @@ export const synthesisTools = {
       projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
-      const db = getDb();
+      const db = await getDb();
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
       const convs = db
@@ -73,7 +73,7 @@ ${allInsights
       projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
-      const db = getDb();
+      const db = await getDb();
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
 
@@ -142,7 +142,7 @@ ${allInsights
       projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
-      const db = getDb();
+      const db = await getDb();
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
       const conts = db.select().from(contacts).where(eq(contacts.projectId, projectId)).all();
@@ -179,7 +179,7 @@ ${allInsights.map((i) => `- [${i.signalStrength}/${i.direction}] ${i.content}`).
       projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
-      const db = getDb();
+      const db = await getDb();
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
 
@@ -224,7 +224,7 @@ ${allInsights
       projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
-      const db = getDb();
+      const db = await getDb();
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
       const conts = db.select().from(contacts).where(eq(contacts.projectId, projectId)).all();
@@ -289,7 +289,7 @@ ${allInsights
       projectId: z.number().describe("Project ID — get this from list_projects or create_project"),
     }),
     handler: async ({ projectId }: { projectId: number }) => {
-      const db = getDb();
+      const db = await getDb();
       const hyps = db.select().from(hypotheses).where(eq(hypotheses.projectId, projectId)).all();
       const allInsights = db.select().from(insights).where(eq(insights.projectId, projectId)).all();
 

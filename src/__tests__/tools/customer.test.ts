@@ -1,14 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as schema from "../../db/schema.js";
+import type { SqliteDb } from "../../db/sqlite.js";
 import { createSqliteDb } from "../../db/sqlite.js";
 
-let testDb: ReturnType<typeof createSqliteDb>;
+let testDb: SqliteDb;
 
 vi.mock("../../db/index.js", async () => {
   const actual = await vi.importActual<typeof import("../../db/schema.js")>("../../db/schema.js");
   return {
     ...actual,
-    getDb: () => testDb,
+    getDb: async () => testDb,
   };
 });
 
@@ -24,8 +25,8 @@ function createProject() {
 }
 
 describe("customer tools", () => {
-  beforeEach(() => {
-    testDb = createSqliteDb(":memory:");
+  beforeEach(async () => {
+    testDb = await createSqliteDb(":memory:");
   });
 
   it("create_icp returns the new ICP", async () => {
