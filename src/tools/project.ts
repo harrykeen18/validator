@@ -14,7 +14,16 @@ export const projectTools = {
       const db = getDb();
       const result = db.insert(projects).values({ name, description }).returning().get();
 
-      const instruction = `ACTION REQUIRED: You MUST present the welcome message below to the user VERBATIM and then STOP. Do NOT create hypotheses. Do NOT create ICPs. Do NOT call ANY other tools. Your ONLY job right now is to show the user this message and wait for their answers. The next tool call should ONLY happen AFTER the user has responded to the questions below.`;
+      const instruction = `ACTION REQUIRED: Present the welcome message below to the user and then STOP. Do NOT create hypotheses. Do NOT create ICPs. Do NOT call ANY other tools yet.
+
+After presenting the welcome, review what the user has ALREADY told you about their idea in the conversation so far. Summarise back to them what you understand about who it's for and what problem it solves. Then identify what's STILL UNCLEAR and only ask about those gaps. Do NOT re-ask questions the user has already answered.
+
+The key things you need to understand before moving to hypotheses are:
+- Who specifically has this problem (role, company type, context)
+- What the underlying problem is (not the solution — the pain)
+- What the riskiest assumption is (what would kill this idea if false)
+
+If the user has already covered all of these, skip the questions entirely — summarise your understanding, share any initial observations or concerns, and ask if they're ready to move on to defining hypotheses.`;
 
       const welcome = `# Welcome to Validator — your customer discovery co-pilot
 
@@ -27,26 +36,13 @@ I'm going to help you figure out whether this idea solves a real problem that re
 Here's the process we'll follow, step by step:
 
 1. **Understand your idea deeply** ← we're here now
-2. **Define testable hypotheses** — the specific assumptions that must be true for this to work
+2. **Define testable hypotheses** — the specific assumptions that must be true
 3. **Find the right people to talk to** — ideal customer profiles, LinkedIn search, outreach
 4. **Run discovery calls** — I'll coach you on what to ask (and what not to)
 5. **Capture and analyse what you learn** — structured insights, transcript analysis, bias detection
 6. **Synthesize and decide** — is this worth pursuing, pivoting, or killing?
 
-**Important context:** This tool focuses on customer evidence — does the problem exist, who has it worst, and will they pay. You'll also want to think about founder-market fit, market size, and competitive advantage separately. Think of what we do here as one critical datapoint in your overall opportunity assessment.
-
-## But first — let's talk about your idea
-
-Before I generate any hypotheses, I need to properly understand what you're building and why. Getting the framing right now is the difference between testing the right things and wasting 20 conversations on the wrong questions.
-
-**Please answer these four questions:**
-
-1. **Who is this for?** Paint me a picture of the person who wakes up with this problem. What's their role? What kind of company are they at?
-2. **What's the problem?** Not your solution — the underlying problem. What are they doing today that's painful, slow, or broken?
-3. **Why you?** What's your connection to this problem? Have you lived it?
-4. **What's your biggest fear?** What's the one thing that, if it turned out to be false, would kill this idea?
-
-Take your time. Your answers will shape everything that follows.`;
+**Important context:** This focuses on customer evidence — does the problem exist, who has it worst, and will they pay. You'll also want to assess founder-market fit, market size, and competitive advantage separately. Think of this as one critical datapoint in your overall opportunity assessment.`;
 
       return {
         content: [
