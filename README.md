@@ -16,13 +16,13 @@
 
 ## What it does
 
-Most startups fail because they build something nobody wants. Validate helps you avoid that by structuring the messy process of customer discovery into a repeatable workflow:
+Building the wrong thing is a direct route to startup failure. Validate helps you avoid that by structuring the messy process of customer discovery into a repeatable workflow:
 
-1. **Define testable hypotheses** — break your idea into specific assumptions
-2. **Find the right people** — build ideal customer profiles, source contacts
-3. **Run discovery calls** — AI-generated call guides following Mom Test principles
-4. **Capture insights** — structured debrief, transcript analysis, bias detection
-5. **Synthesize and decide** — cross-call pattern analysis, pivot signals, validation scorecards
+1. **Define testable hypotheses:** break your idea into specific assumptions
+2. **Find the right people:** build ideal customer profiles, source contacts
+3. **Run discovery calls:** AI-generated call guides following Mom Test principles
+4. **Capture insights:** structured debrief, transcript analysis, bias detection
+5. **Synthesize and decide:** cross-call pattern analysis, pivot signals, validation scorecards
 
 It runs as an [MCP server](https://modelcontextprotocol.io), so it works inside Claude Desktop, Claude Code, or any MCP-compatible client.
 
