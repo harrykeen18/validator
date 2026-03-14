@@ -7,10 +7,14 @@ export interface Config {
   port: number;
 }
 
+import os from "node:os";
+import path from "node:path";
+
 export function loadConfig(): Config {
+  const defaultDbPath = path.join(os.homedir(), ".validator", "data.db");
   return {
     dbMode: (process.env.DB_MODE as "sqlite" | "postgres") || "sqlite",
-    dbPath: process.env.DB_PATH || "./validator.db",
+    dbPath: process.env.DB_PATH || defaultDbPath,
     databaseUrl: process.env.DATABASE_URL || "",
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || "",
     transport: (process.env.TRANSPORT as "stdio" | "sse") || "stdio",
