@@ -29,7 +29,7 @@
       "description": "Your Anthropic API key — used for AI-powered coaching features like call guides, transcript analysis, and next-step suggestions",
       "required": true,
       "sensitive": true
-    },
+    }
   },
   "tools": [
     {
