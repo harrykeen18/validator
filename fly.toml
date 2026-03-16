@@ -1,20 +1,31 @@
-app = "validator-mcp"
-primary_region = "lhr"
+# fly.toml app configuration file generated for validator-mcp on 2026-03-16T10:10:14Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'validator-mcp'
+primary_region = 'lhr'
 
 [build]
 
 [env]
-  TRANSPORT = "sse"
-  DB_MODE = "sqlite"
-  DB_PATH = "/data/validator.db"
+  DB_MODE = 'sqlite'
+  DB_PATH = '/data/validator.db'
+  TRANSPORT = 'sse'
+
+[[mounts]]
+  source = 'validator_data'
+  destination = '/data'
 
 [http_service]
   internal_port = 3000
   force_https = true
-  auto_stop_machines = "stop"
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
 
-[mounts]
-  source = "validator_data"
-  destination = "/data"
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 1024
